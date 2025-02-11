@@ -6,6 +6,13 @@
 git clone git@github.com:romain-sadar/moodmap.git
 cd moodmap
 ```
+## Install pre-commit
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
 ## Docker installation
 
 
