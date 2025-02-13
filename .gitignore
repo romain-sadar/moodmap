@@ -1,0 +1,19 @@
+# Django
+local.py
+db.sqlite3
+gaia.sqlite3
+*.sqlite3
+db.sqlite3-journal
+
+#env files
+.envs/
+
+# local docker
+.bash_history
+.ipython/
+.pdbhistory
+
+__pycache__
+**/__pycache__/
+**/__pycache__/*
+
