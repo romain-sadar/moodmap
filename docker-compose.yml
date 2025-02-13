@@ -20,7 +20,7 @@ services:
     command: bash -c "python manage.py runserver 0.0.0.0:8000"
 
   db:
-    image: postgres:13
+    image: postgis/postgis:13-3.0
     container_name: moodmap_db
     env_file:
       - .envs/.local/.postgres

@@ -9,6 +9,15 @@ ENV PYTHONUNBUFFERED=1
 # Set the working directory in the container
 WORKDIR /app/backend
 
+# Update package lists and install dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    gdal-bin \
+    libgdal-dev
+
+# Optionally set the GDAL_LIBRARY_PATH if needed
+ENV GDAL_LIBRARY_PATH = '/usr/lib/x86_64-linux-gnu/libgdal.so'
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \

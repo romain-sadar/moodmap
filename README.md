@@ -27,10 +27,11 @@ PYTEST_ADDOPTS=--pdbcls=IPython.terminal.debugger:Pdb -n 0
 2. Create a `.envs/.local/.postgres` file with following content
 
 ```
-POSTGRES_USER=<TO DEFINE>
-POSTGRES_PASSWORD=<TO DEFINE>
-POSTGRES_HOST=postgis
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=root
+POSTGRES_HOST=moodmap_db
 POSTGRES_DB=moodmap
+CURRENT_ENV=CICD
 PGADMIN_LISTEN_PORT=8052
 ```
 
