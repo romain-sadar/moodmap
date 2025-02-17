@@ -35,7 +35,7 @@ CURRENT_ENV=CICD
 PGADMIN_LISTEN_PORT=8052
 ```
 
-3. Add a config/local.py file
+1. Create in `backend/config/`  => `local.py`  file with following content
 ```
 from os import getenv
 
