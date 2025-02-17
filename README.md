@@ -37,14 +37,14 @@ PGADMIN_LISTEN_PORT=8052
 
 3. Add a config/local.py file
 ```
-from os import getenv
+import os
 
 from config.settings import *  # noqa
 
 # SECURITY WARNING: don"t run with debug turned on in production!
 DEBUG = True
 ALLOWED_HOSTS = [
-    getenv("ALLOWED_HOSTS", "*"),
+    os.getenv("ALLOWED_HOSTS", "*"),
 ]
 
 # Database
@@ -52,12 +52,17 @@ ALLOWED_HOSTS = [
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": getenv("POSTGRES_DB", "moodmap"),
-        "USER": getenv("POSTGRES_USER", "postgres"),
-        "PASSWORD": getenv("POSTGRES_PASSWORD"),
-        "HOST": getenv("POSTGRES_HOST", default="localhost"),
+        "NAME": os.getenv("POSTGRES_DB", "moodmap"),
+        "USER": os.getenv("POSTGRES_USER", "postgres"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "root"),
+        "HOST": os.getenv(
+            "POSTGRES_HOST", "postgis"
+        ),  # Ensure this matches your .env file
+        "PORT": "5432",
     }
 }
+
+GDAL_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu/libgdal.so"
 
 ```
 
