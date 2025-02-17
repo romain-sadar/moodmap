@@ -1,7 +1,7 @@
 export PROJECT_NAME=moodmap
 export TEST_PATH?=backend/tests
 export COMPOSE_FILE?=docker-compose.yml
-export WEB_CONTAINER=$$(docker ps -f "name=django" --format {{.Names}} | head -n1)
+export WEB_CONTAINER=$$(docker ps -f "name=${PROJECT_NAME}_backend" --format {{.Names}} | head -n1)
 
 build:
 	@docker compose -p ${PROJECT_NAME} build
@@ -24,4 +24,5 @@ print-container:
 	@echo "Backend container: ${WEB_CONTAINER}"
 
 shell:
-	@docker container exec -it ${WEB_CONTAINER} sh
+	@echo "Web container: ${WEB_CONTAINER}"
+	@docker container exec -it ${WEB_CONTAINER} bash
