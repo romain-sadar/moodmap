@@ -31,8 +31,6 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=root
 POSTGRES_HOST=moodmap_db
 POSTGRES_DB=moodmap
-CURRENT_ENV=CICD
-PGADMIN_LISTEN_PORT=8052
 ```
 
 1. Create in `backend/config/`  => `local.py`  file with following content
