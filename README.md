@@ -72,6 +72,8 @@ For Linux - `sudo apt-get install build-essential`
 
 For MacOS - `brew install make`
 
+For Windows, using [Chocolatey](https://chocolatey.org/install) `choco install make`
+
 
 5. Run `make build`
 
