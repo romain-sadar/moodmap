@@ -4,28 +4,37 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('api', '0001_initial'),
+        ("api", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='user',
-            name='bio',
+            model_name="user",
+            name="bio",
         ),
         migrations.RemoveField(
-            model_name='user',
-            name='profile_picture',
+            model_name="user",
+            name="profile_picture",
         ),
         migrations.AddField(
-            model_name='user',
-            name='age',
+            model_name="user",
+            name="age",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='gender',
-            field=models.CharField(blank=True, choices=[('M', 'Male'), ('F', 'Female'), ('O', 'Other'), ('N', 'Prefer not to say')], max_length=1, null=True),
+            model_name="user",
+            name="gender",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("M", "Male"),
+                    ("F", "Female"),
+                    ("O", "Other"),
+                    ("N", "Prefer not to say"),
+                ],
+                max_length=1,
+                null=True,
+            ),
         ),
     ]

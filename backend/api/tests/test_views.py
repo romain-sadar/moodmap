@@ -6,7 +6,7 @@ from django.urls import reverse
 
 @pytest.mark.django_db
 def test_user_login_success():
-    user = UserFactory(email="test@example.com", password="testpassword123")
+    UserFactory(email="test@example.com", password="testpassword123")
 
     client = APIClient()
     url = reverse("login")
@@ -15,9 +15,6 @@ def test_user_login_success():
         "password": "testpassword123",
     }
     response = client.post(url, data, format="json")
-
-    breakpoint()
-
     assert response.status_code == 200
     assert "tokens" in response.data
     assert "access" in response.data["tokens"]
@@ -43,7 +40,7 @@ def test_user_login_invalid_credentials():
 
 @pytest.mark.django_db
 def test_user_login_inactive_user():
-    user = UserFactory(email="test@example.com", is_active=False)
+    UserFactory(email="test@example.com", is_active=False)
 
     client = APIClient()
     url = reverse("login")
