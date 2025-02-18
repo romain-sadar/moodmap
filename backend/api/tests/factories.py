@@ -1,5 +1,5 @@
 import factory
-from api.models import User
+from api.models import User, Mood
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -12,3 +12,10 @@ class UserFactory(factory.django.DjangoModelFactory):
     age = 25
     gender = "M"
     premium = False
+
+
+class MoodFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Mood
+
+    label = factory.Faker("pystr")

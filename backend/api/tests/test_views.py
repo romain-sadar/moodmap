@@ -1,6 +1,6 @@
 import pytest
 from rest_framework.test import APIClient
-from api.tests.factories import UserFactory
+from api.tests.factories import UserFactory, MoodFactory
 from django.urls import reverse
 
 
@@ -64,3 +64,66 @@ def test_user_login_inactive_user():
     assert response.status_code == 400
     assert "non_field_errors" in response.data
     assert "User account is not active." in response.data["non_field_errors"]
+
+
+@pytest.mark.django_db
+def test_mood_list():
+    MoodFactory.create_batch(3)  # Create 3 mood instances
+
+    client = APIClient()
+    url = reverse("mood-list")  # Update based on your router's name
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 3  # Ensure all moods are returned
+
+
+@pytest.mark.django_db
+def test_mood_create():
+    client = APIClient()
+    url = reverse("mood-list")  # URL for creating a new Mood
+    data = {"label": "Excited"}
+
+    response = client.post(url, data, format="json")
+
+    assert response.status_code == 201  # Created
+    assert response.data["label"] == "Excited"
+
+
+@pytest.mark.django_db
+def test_mood_retrieve():
+    mood = MoodFactory(label="Happy")
+
+    client = APIClient()
+    url = reverse(
+        "mood-detail", kwargs={"pk": mood.pk}
+    )  # URL for retrieving a specific mood
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["label"] == "Happy"
+
+
+@pytest.mark.django_db
+def test_mood_update():
+    mood = MoodFactory(label="Sad")
+
+    client = APIClient()
+    url = reverse("mood-detail", kwargs={"pk": mood.pk})  # URL for updating a mood
+    data = {"label": "Cheerful"}
+
+    response = client.put(url, data, format="json")
+
+    assert response.status_code == 200
+    assert response.data["label"] == "Cheerful"
+
+
+@pytest.mark.django_db
+def test_mood_delete():
+    mood = MoodFactory()
+
+    client = APIClient()
+    url = reverse("mood-detail", kwargs={"pk": mood.pk})  # URL for deleting a mood
+    response = client.delete(url)
+
+    assert response.status_code == 204  # No content (successful deletion)
