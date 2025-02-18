@@ -1,5 +1,5 @@
 import factory
-from api.models import User, Mood
+from api.models import User, Mood, Place, VisitedPlace, FavouritePlace, Category
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -19,3 +19,52 @@ class MoodFactory(factory.django.DjangoModelFactory):
         model = Mood
 
     label = factory.Faker("pystr")
+
+
+class PlaceFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Place
+
+    label = factory.Faker("word")
+    latitude = factory.Faker("latitude")
+    longitude = factory.Faker("longitude")
+    address = factory.Faker("address")
+    description = factory.Faker("paragraph")
+    category = factory.SubFactory("api.tests.factories.CategoryFactory")
+    photo = factory.Faker("image_url")
+
+    @factory.post_generation
+    def moods(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            self.moods.set(extracted)
+        else:
+            self.moods.set([MoodFactory.create() for _ in range(2)])
+
+
+class VisitedPlaceFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = VisitedPlace
+
+    user = factory.SubFactory("api.tests.factories.UserFactory")
+    place = factory.SubFactory("api.tests.factories.PlaceFactory")
+    visited_time = factory.Faker("date_time_this_year")
+    mood_feedback = factory.SubFactory("api.tests.factories.MoodFactory")
+
+
+class FavouritePlaceFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = FavouritePlace
+
+    user = factory.SubFactory("api.tests.factories.UserFactory")
+    place = factory.SubFactory("api.tests.factories.PlaceFactory")
+    added_at = factory.Faker("date_time_this_year")
+
+
+class CategoryFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Category
+
+    slug = factory.Faker("slug")
+    verbose_label = factory.Faker("word")

@@ -5,12 +5,16 @@ from api.serializers import (
     UserUpdateSerializer,
     UserSerializer,
     MoodSerializer,
+    PlaceSerializer,
+    VisitedPlaceSerializer,
+    FavouritePlaceSerializer,
+    CategorySerializer,
 )
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import action
-from api.models import Mood
+from api.models import Mood, Place, VisitedPlace, FavouritePlace, Category
 
 
 class AuthViewSet(viewsets.GenericViewSet):
@@ -93,3 +97,49 @@ class AuthViewSet(viewsets.GenericViewSet):
 class MoodViewSet(viewsets.ModelViewSet):
     serializer_class = MoodSerializer
     queryset = Mood.objects.all()
+
+
+class PlaceViewSet(viewsets.ModelViewSet):
+    """
+    A ViewSet for handling Places.
+    """
+
+    serializer_class = PlaceSerializer
+    queryset = Place.objects.all()
+
+    @action(detail=True, methods=["get"], url_path="moods")
+    def get_moods(self, request, pk=None):
+        """
+        Returns the moods associated with a place.
+        """
+        place = self.get_object()
+        moods = place.moods.all()
+        mood_serializer = MoodSerializer(moods, many=True)
+        return Response(mood_serializer.data)
+
+
+class VisitedPlaceViewSet(viewsets.ModelViewSet):
+    """
+    A ViewSet for handling VisitedPlaces.
+    """
+
+    serializer_class = VisitedPlaceSerializer
+    queryset = VisitedPlace.objects.all()
+
+
+class FavouritePlaceViewSet(viewsets.ModelViewSet):
+    """
+    A ViewSet for handling FavouritePlaces.
+    """
+
+    serializer_class = FavouritePlaceSerializer
+    queryset = FavouritePlace.objects.all()
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    """
+    A ViewSet for handling Categories.
+    """
+
+    serializer_class = CategorySerializer
+    queryset = Category.objects.all()
