@@ -1,4 +1,4 @@
-from rest_framework import viewsets, mixins, status
+from rest_framework import viewsets, status
 from api.serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
@@ -63,6 +63,7 @@ class AuthViewSet(viewsets.GenericViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    class MoodViewSet(viewsets.ModelViewSet):
-        serializer_class = MoodSerializer
-        queryset = Mood.objects.all()
+
+class MoodViewSet(viewsets.ModelViewSet):
+    serializer_class = MoodSerializer
+    queryset = Mood.objects.all()
