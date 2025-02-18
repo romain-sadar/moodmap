@@ -8,13 +8,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = (
-            "username",
-            "email",
-            "password",
-            "age",
-            "gender",
-        )
+        fields = ("username", "email", "password")
+        extra_kwargs = {
+            "username": {"required": True},
+            "email": {"required": True},
+        }
 
     def validate_username(self, value):
         """
@@ -34,25 +32,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("A user with this email already exists.")
         return value
 
-    def validate_age(self, value):
-        """
-        Validate that the age is a positive integer.
-        """
-        if value < 0:
-            raise serializers.ValidationError("Age must be a positive integer.")
-        return value
-
-    def validate_gender(self, value):
-        """
-        Validate that the gender is one of the valid choices.
-        """
-        valid_genders = [choice[0] for choice in User.GENDER_CHOICES]
-        if value not in valid_genders:
-            raise serializers.ValidationError(
-                f"Gender must be one of: {', '.join(valid_genders)}"
-            )
-        return value
-
     def create(self, validated_data):
         """
         Create and return a new User instance.
@@ -61,8 +40,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             username=validated_data["username"],
             email=validated_data["email"],
             password=validated_data["password"],
-            age=validated_data["age"],
-            gender=validated_data["gender"],
         )
         return user
 

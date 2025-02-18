@@ -1,7 +1,69 @@
 import pytest
+from rest_framework import status
 from rest_framework.test import APIClient
+from rest_framework.exceptions import ErrorDetail
 from api.tests.factories import UserFactory, MoodFactory
 from django.urls import reverse
+
+
+@pytest.fixture
+def api_client():
+    return APIClient()
+
+
+@pytest.fixture
+def user_data():
+    return {
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123",
+    }
+
+
+@pytest.fixture
+def existing_user():
+    return UserFactory()  # Using the UserFactory to create a user
+
+
+@pytest.mark.django_db
+def test_register_success(api_client, user_data):
+    # Test for successful user registration
+    response = api_client.post(reverse("auth-register"), user_data, format="json")
+
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.data["message"] == "User registered successfully"
+    assert "user_id" in response.data
+
+
+@pytest.mark.django_db
+def test_register_user_already_exists(api_client, existing_user, user_data):
+    # Test for attempting to register a user that already exists
+    response = api_client.post(
+        reverse("auth-register"),
+        {
+            **user_data,
+            "email": existing_user.email,  # Duplicate email
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data["email"] == [
+        ErrorDetail(
+            string="User with this email address already exists.", code="unique"
+        )
+    ]
+
+
+@pytest.mark.django_db
+def test_register_missing_fields(api_client):
+    # Test for missing fields in the registration request
+    response = api_client.post(reverse("auth-register"), {}, format="json")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "username" in response.data
+    assert "email" in response.data
+    assert "password" in response.data
 
 
 @pytest.mark.django_db
