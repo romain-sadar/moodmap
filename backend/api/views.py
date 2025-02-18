@@ -1,8 +1,13 @@
 from rest_framework import viewsets, mixins, status
+from api.serializers import (
+    UserRegistrationSerializer,
+    UserLoginSerializer,
+    MoodSerializer,
+)
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import action
-from api.serializers import UserRegistrationSerializer, UserLoginSerializer
+from api.models import Mood
 
 
 class AuthViewSet(viewsets.GenericViewSet):
@@ -57,3 +62,7 @@ class AuthViewSet(viewsets.GenericViewSet):
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    class MoodViewSet(viewsets.ModelViewSet):
+        serializer_class = MoodSerializer
+        queryset = Mood.objects.all()

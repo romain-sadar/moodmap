@@ -52,3 +52,14 @@ class User(UUIDModel, AbstractUser):
         constraints = [
             models.UniqueConstraint(fields=["email"], name="unique_email"),
         ]
+
+
+class Mood(UUIDModel):
+    label = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self):
+        return self.label

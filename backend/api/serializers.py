@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from api.models import User
+from api.models import User, Mood
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -89,3 +89,9 @@ class UserLoginSerializer(serializers.Serializer):
 
         data["user"] = user
         return data
+
+
+class MoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mood
+        fields = ("label",)
