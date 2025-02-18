@@ -1,9 +1,20 @@
 import pytest
 from django.contrib.auth import get_user_model
-from api.models import Place, VisitedPlace, FavouritePlace, Category
-from api.tests.factories import PlaceFactory, UserFactory, VisitedPlaceFactory, FavouritePlaceFactory, CategoryFactory, MoodFactory
+from api.tests.factories import (
+    PlaceFactory,
+    UserFactory,
+    CategoryFactory,
+    MoodFactory,
+)
 from django.core.files.uploadedfile import SimpleUploadedFile
-from api.serializers import PlaceSerializer, UserRegistrationSerializer, VisitedPlaceSerializer, FavouritePlaceSerializer, CategorySerializer, MoodSerializer
+from api.serializers import (
+    PlaceSerializer,
+    UserRegistrationSerializer,
+    VisitedPlaceSerializer,
+    FavouritePlaceSerializer,
+    CategorySerializer,
+    MoodSerializer,
+)
 from io import BytesIO
 from PIL import Image
 
@@ -64,21 +75,20 @@ def test_mood_serializer_missing_label():
     )  # Should be valid due to `null=True, blank=True`
 
 
-
 @pytest.mark.django_db
 def test_place_serializer_valid_data():
     category = CategoryFactory()  # Ensure there's a category for the place
-    
+
     # Create the required moods in the database
     mood_happy = MoodFactory(label="Happy")
     mood_relaxed = MoodFactory(label="Relaxed")
-    
+
     # Create a valid image using BytesIO and PIL
     image_file = BytesIO()
     image = Image.new("RGB", (100, 100), color="red")  # Create a 100x100 red image
     image.save(image_file, "JPEG")
     image_file.name = "park.jpg"
-    image_file.seek(0)  # Reset the file pointer to the beginning    
+    image_file.seek(0)  # Reset the file pointer to the beginning
     photo = SimpleUploadedFile("park.jpg", image_file.read(), content_type="image/jpeg")
 
     data = {
@@ -93,7 +103,7 @@ def test_place_serializer_valid_data():
     }
 
     serializer = PlaceSerializer(data=data)
-    
+
     # Validate the serializer
     assert serializer.is_valid(), serializer.errors
     place = serializer.save()

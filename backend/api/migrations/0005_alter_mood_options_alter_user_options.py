@@ -4,18 +4,17 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('api', '0004_alter_user_username'),
+        ("api", "0004_alter_user_username"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='mood',
-            options={'verbose_name': 'Mood', 'verbose_name_plural': 'Moods'},
+            name="mood",
+            options={"verbose_name": "Mood", "verbose_name_plural": "Moods"},
         ),
         migrations.AlterModelOptions(
-            name='user',
-            options={'verbose_name': 'User', 'verbose_name_plural': 'Users'},
+            name="user",
+            options={"verbose_name": "User", "verbose_name_plural": "Users"},
         ),
     ]

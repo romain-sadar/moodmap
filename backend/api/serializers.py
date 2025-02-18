@@ -113,14 +113,20 @@ class MoodSerializer(serializers.ModelSerializer):
         model = Mood
         fields = ("label",)
 
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('slug', 'verbose_label')
+        fields = ("slug", "verbose_label")
+
 
 class PlaceSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
-    moods = MoodSerializer(many=True)
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(), slug_field="slug"
+    )
+    moods = serializers.SlugRelatedField(
+        queryset=Mood.objects.all(), slug_field="label", many=True
+    )
 
     class Meta:
         model = Place
@@ -136,22 +142,24 @@ class PlaceSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
-        
+
+
 class VisitedPlaceSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
     place = serializers.PrimaryKeyRelatedField(queryset=Place.objects.all(), many=True)
-    mood_feedback = serializers.PrimaryKeyRelatedField(queryset=Mood.objects.all(), required=False)
+    mood_feedback = serializers.PrimaryKeyRelatedField(
+        queryset=Mood.objects.all(), required=False
+    )
 
     class Meta:
         model = VisitedPlace
-        fields = ('user', 'place', 'visited_time', 'mood_feedback')
+        fields = ("user", "place", "visited_time", "mood_feedback")
 
 
 class FavouritePlaceSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
-    place = serializers.PrimaryKeyRelatedField(queryset=Place.objects.all(), many=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    place = serializers.PrimaryKeyRelatedField(queryset=Place.objects.all())
 
     class Meta:
         model = FavouritePlace
-        fields = ('user', 'place', 'added_at')
-
+        fields = ("user", "place", "added_at")
