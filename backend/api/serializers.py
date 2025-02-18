@@ -68,6 +68,46 @@ class UserLoginSerializer(serializers.Serializer):
         return data
 
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("username", "email", "age", "gender", "premium")
+
+    def validate_username(self, value):
+        """
+        Ensure the username is unique if modified.
+        """
+        if User.objects.filter(username=value).exclude(id=self.instance.id).exists():
+            raise serializers.ValidationError(
+                "A user with this username already exists."
+            )
+        return value
+
+    def validate_email(self, value):
+        """
+        Ensure the email is unique if modified.
+        """
+        if User.objects.filter(email=value).exclude(id=self.instance.id).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+        return value
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "username",
+            "email",
+            "premium",
+            "gender",
+            "age",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("id", "created_at", "updated_at")
+
+
 class MoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mood
