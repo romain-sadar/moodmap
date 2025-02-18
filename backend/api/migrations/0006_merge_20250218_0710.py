@@ -4,11 +4,9 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('api', '0004_category_place_visitedplace_favouriteplace'),
-        ('api', '0005_alter_mood_options_alter_user_options'),
+        ("api", "0004_category_place_visitedplace_favouriteplace"),
+        ("api", "0005_alter_mood_options_alter_user_options"),
     ]
 
-    operations = [
-    ]
+    operations = []
