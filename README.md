@@ -18,7 +18,8 @@ pre-commit install
 1. Create a `.envs/.local/.django` file with following content
 
 ```
-ALLOWED_HOSTS=[*]
+ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+SECRET_KEY=<TO DEFINE>
 DJANGO_SETTINGS_MODULE=config.local
 PYTHONBREAKPOINT=ipdb.set_trace
 PYTEST_ADDOPTS=--pdbcls=IPython.terminal.debugger:Pdb -n 0
@@ -31,8 +32,6 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=root
 POSTGRES_HOST=moodmap_db
 POSTGRES_DB=moodmap
-CURRENT_ENV=CICD
-PGADMIN_LISTEN_PORT=8052
 ```
 
 1. Create in `backend/config/`  => `local.py`  file with following content
@@ -43,9 +42,8 @@ from config.settings import *  # noqa
 
 # SECURITY WARNING: don"t run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = [
-    os.getenv("ALLOWED_HOSTS", "*"),
-]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

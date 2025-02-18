@@ -1,7 +1,7 @@
 import pytest
 from django.contrib.auth import get_user_model
 from api.tests.factories import UserFactory
-from api.serializers import UserRegistrationSerializer
+from api.serializers import UserRegistrationSerializer, MoodSerializer
 
 User = get_user_model()
 
@@ -37,3 +37,30 @@ def test_user_registration_serializer_duplicate_email():
     serializer = UserRegistrationSerializer(data=data)
     assert not serializer.is_valid()
     assert "email" in serializer.errors
+
+
+@pytest.mark.django_db
+def test_mood_serializer_valid_data():
+    data = {"label": "Happy"}
+    serializer = MoodSerializer(data=data)
+    assert serializer.is_valid(), serializer.errors
+    mood = serializer.save()
+    assert mood.label == "Happy"
+
+
+@pytest.mark.django_db
+def test_mood_serializer_blank_label():
+    data = {"label": ""}
+    serializer = MoodSerializer(data=data)
+    assert serializer.is_valid(), (
+        serializer.errors
+    )  # Should be valid since label is nullable/blank
+
+
+@pytest.mark.django_db
+def test_mood_serializer_missing_label():
+    data = {}  # No label provided
+    serializer = MoodSerializer(data=data)
+    assert serializer.is_valid(), (
+        serializer.errors
+    )  # Should be valid due to `null=True, blank=True`
