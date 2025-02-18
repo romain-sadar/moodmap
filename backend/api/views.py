@@ -2,9 +2,12 @@ from rest_framework import viewsets, status
 from api.serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
+    UserUpdateSerializer,
+    UserSerializer,
     MoodSerializer,
 )
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import action
 from api.models import Mood
@@ -12,10 +15,8 @@ from api.models import Mood
 
 class AuthViewSet(viewsets.GenericViewSet):
     """
-    A ViewSet that handles user registration and login.
+    A ViewSet that handles user registration, login, and profile updates.
     """
-
-    serializer_class = None  # Will be set dynamically
 
     @action(detail=False, methods=["post"], url_path="register")
     def register(self, request):
@@ -26,8 +27,12 @@ class AuthViewSet(viewsets.GenericViewSet):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            # Use UserSerializer to return the registered user's data
             return Response(
-                {"message": "User registered successfully", "user_id": user.id},
+                {
+                    "message": "User registered successfully",
+                    "user": UserSerializer(user).data,
+                },
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -48,15 +53,36 @@ class AuthViewSet(viewsets.GenericViewSet):
             return Response(
                 {
                     "message": "Login successful",
-                    "user": {
-                        "id": user.id,
-                        "username": user.username,
-                        "email": user.email,
-                    },
+                    "user": UserSerializer(user).data,  # Use UserSerializer here
                     "tokens": {
                         "refresh": str(refresh),
                         "access": access_token,
                     },
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(
+        detail=False,
+        methods=["patch"],
+        url_path="update-profile",
+        permission_classes=[IsAuthenticated],
+    )
+    def update_profile(self, request):
+        """
+        Handles updating the user profile.
+        """
+        user = request.user
+        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "message": "User profile updated successfully",
+                    "user": serializer.data,
                 },
                 status=status.HTTP_200_OK,
             )
