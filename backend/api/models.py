@@ -22,7 +22,8 @@ class User(UUIDModel, AbstractUser):
         ("N", "Prefer not to say"),
     ]
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["username"]
+    username = models.CharField(max_length=150, unique=True, blank=True, null=True)
     groups = models.ManyToManyField(
         "auth.Group",
         related_name="custom_user_groups",
@@ -48,7 +49,23 @@ class User(UUIDModel, AbstractUser):
         return self.username
 
     class Meta:
-        verbose_name = "User profile"
+        verbose_name = "User"
+        verbose_name_plural = "Users"
         constraints = [
             models.UniqueConstraint(fields=["email"], name="unique_email"),
         ]
+
+
+class Mood(UUIDModel):
+    label = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self):
+        return self.label
+
+    class Meta:
+        verbose_name = "Mood"
+        verbose_name_plural = "Moods"
