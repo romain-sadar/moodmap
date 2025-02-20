@@ -134,7 +134,6 @@ class PlaceSerializer(serializers.ModelSerializer):
             "label",
             "latitude",
             "longitude",
-            "address",
             "description",
             "category",
             "photo",

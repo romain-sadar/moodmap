@@ -75,7 +75,6 @@ class Place(UUIDModel):
     label = models.CharField(max_length=255, verbose_name="Name")
     latitude = models.FloatField()
     longitude = models.FloatField()
-    address = models.TextField()
     description = models.TextField(blank=True, null=True)
     category = models.OneToOneField(
         "Category", on_delete=models.CASCADE, related_name="place"

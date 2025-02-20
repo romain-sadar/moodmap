@@ -95,7 +95,6 @@ def test_place_serializer_valid_data():
         "label": "Park",
         "latitude": 40.7128,
         "longitude": -74.0060,
-        "address": "123 Park St, NY",
         "description": "A beautiful park in the city",
         "category": category.slug,
         "photo": photo,

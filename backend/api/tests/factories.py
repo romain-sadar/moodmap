@@ -28,7 +28,6 @@ class PlaceFactory(factory.django.DjangoModelFactory):
     label = factory.Faker("word")
     latitude = factory.Faker("latitude")
     longitude = factory.Faker("longitude")
-    address = factory.Faker("address")
     description = factory.Faker("paragraph")
     category = factory.SubFactory("api.tests.factories.CategoryFactory")
     photo = factory.Faker("image_url")
@@ -47,10 +46,20 @@ class VisitedPlaceFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = VisitedPlace
 
-    user = factory.SubFactory("api.tests.factories.UserFactory")
-    place = factory.SubFactory("api.tests.factories.PlaceFactory")
     visited_time = factory.Faker("date_time_this_year")
     mood_feedback = factory.SubFactory("api.tests.factories.MoodFactory")
+
+    @factory.post_generation
+    def user(self, create, extracted, **kwargs):
+        if not create or not extracted:
+            return
+        self.user.set(extracted)  
+
+    @factory.post_generation
+    def place(self, create, extracted, **kwargs):
+        if not create or not extracted:
+            return
+        self.place.set(extracted)  
 
 
 class FavouritePlaceFactory(factory.django.DjangoModelFactory):
