@@ -76,7 +76,7 @@ class Place(UUIDModel):
     latitude = models.FloatField()
     longitude = models.FloatField()
     description = models.TextField(blank=True, null=True)
-    category = models.OneToOneField(
+    category = models.ForeignKey(
         "Category", on_delete=models.CASCADE, related_name="place"
     )
     photo = models.ImageField(upload_to="place_photos/", blank=True, null=True)
@@ -93,8 +93,20 @@ class Place(UUIDModel):
 
 
 class VisitedPlace(UUIDModel):
-    user = models.ManyToManyField("User", related_name="visited_places")
-    place = models.ManyToManyField("Place", related_name="visits")
+    user = models.ForeignKey(
+        "User",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="visited_places",
+    )
+    place = models.ForeignKey(
+        "Place",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="visits",
+    )
     visited_time = models.DateTimeField()
     mood_feedback = models.ForeignKey(
         "Mood",
@@ -105,7 +117,7 @@ class VisitedPlace(UUIDModel):
     )
 
     def __str__(self):
-        return f"Visited by {', '.join([user.username for user in self.user.all()])} at {self.place.first().label}"
+        return f"User {self.user.username} visited {self.place.label} at {self.visited_time}"
 
     class Meta:
         verbose_name = "Visited Place"

@@ -144,8 +144,8 @@ class PlaceSerializer(serializers.ModelSerializer):
 
 
 class VisitedPlaceSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
-    place = serializers.PrimaryKeyRelatedField(queryset=Place.objects.all(), many=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    place = serializers.PrimaryKeyRelatedField(queryset=Place.objects.all())
     mood_feedback = serializers.PrimaryKeyRelatedField(
         queryset=Mood.objects.all(), required=False
     )

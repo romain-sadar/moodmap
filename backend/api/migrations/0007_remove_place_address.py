@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('api', '0006_merge_20250218_0710'),
+        ("api", "0006_merge_20250218_0710"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='place',
-            name='address',
+            model_name="place",
+            name="address",
         ),
     ]

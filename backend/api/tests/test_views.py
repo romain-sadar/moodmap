@@ -1,12 +1,18 @@
-from datetime import datetime, timezone
+from datetime import timezone
 import pytest
-from api.models import VisitedPlace, FavouritePlace, Category
+from api.models import FavouritePlace, Category
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework.exceptions import ErrorDetail
-from api.tests.factories import UserFactory, MoodFactory, PlaceFactory, VisitedPlaceFactory, FavouritePlaceFactory, CategoryFactory
+from api.tests.factories import (
+    UserFactory,
+    MoodFactory,
+    PlaceFactory,
+    VisitedPlaceFactory,
+    FavouritePlaceFactory,
+    CategoryFactory,
+)
 from django.urls import reverse
-from datetime import timezone
 
 
 @pytest.fixture
@@ -223,40 +229,32 @@ def test_mood_delete():
 
 @pytest.mark.django_db
 def test_place_retrieve():
-    # Create a category, mood, and place
-    category = CategoryFactory()  # Assuming you have a factory for Category
-    mood = MoodFactory()  # Assuming you have a factory for Mood
+    category = CategoryFactory()
+    mood = MoodFactory()
     place = PlaceFactory(category=category, moods=[mood])
-    
-    # Prepare the URL for the 'place-detail' endpoint
+
     url = reverse("place-detail", kwargs={"pk": place.pk})
 
-    # Create a client to simulate API requests
     client = APIClient()
 
-    # Send GET request to retrieve the place details
     response = client.get(url)
 
-    # Assert that the response status code is 200 OK
     assert response.status_code == status.HTTP_200_OK
-    # Assert that the response data contains the expected place fields
     assert response.data["label"] == place.label
     assert response.data["latitude"] == float(place.latitude)
     assert response.data["longitude"] == float(place.longitude)
     assert response.data["description"] == place.description
-    assert response.data["category"] == category.slug  # Assert category reference
-    assert response.data["moods"][0] == mood.label  # Assert that the mood is included
-    assert "created_at" in response.data  # Check that created_at field is returned
-    assert "updated_at" in response.data  # Check that updated_at field is returned
+    assert response.data["category"] == category.slug
+    assert response.data["moods"][0] == mood.label
+    assert "created_at" in response.data
+    assert "updated_at" in response.data
 
 
 @pytest.mark.django_db
 def test_visited_place_list(api_client):
     user = UserFactory()
     place = PlaceFactory()
-    visited_place = VisitedPlace.objects.create(visited_time=datetime.now())
-    visited_place.user.set([user])  # Correcting ManyToMany assignment
-    visited_place.place.set([place])  # Correcting ManyToMany assignment
+    VisitedPlaceFactory(user=user, place=place)
 
     url = reverse("visited-place-list")
     response = api_client.get(url)
@@ -265,17 +263,20 @@ def test_visited_place_list(api_client):
     assert len(response.data["results"]) == 1
 
 
-
 @pytest.mark.django_db
 def test_visited_place_retrieve(api_client):
     visited_place = VisitedPlaceFactory()
-    
+
     url = reverse("visited-place-detail", kwargs={"pk": visited_place.pk})
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data["visited_time"] == visited_place.visited_time.isoformat() + "Z"
-    assert response.data["mood_feedback"] == visited_place.mood_feedback.id if visited_place.mood_feedback else None
+    assert (
+        response.data["mood_feedback"] == visited_place.mood_feedback.id
+        if visited_place.mood_feedback
+        else None
+    )
 
 
 @pytest.mark.django_db
@@ -286,8 +287,8 @@ def test_visited_place_create(api_client):
 
     url = reverse("visited-place-list")
     data = {
-        "user": [user.pk],  # ManyToMany expects a list
-        "place": [place.pk],  # ManyToMany expects a list
+        "user": user.pk,
+        "place": place.pk,
         "visited_time": "2025-02-18T12:00:00Z",
         "mood_feedback": mood.pk,
     }
@@ -323,8 +324,6 @@ def test_visited_place_delete(api_client):
     response = api_client.delete(url)
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
-    
-    
 
 
 @pytest.mark.django_db
@@ -351,7 +350,13 @@ def test_favourite_place_retrieve(api_client):
     assert response.status_code == status.HTTP_200_OK
     assert response.data["user"] == favourite_place.user.id
     assert response.data["place"] == favourite_place.place.id
-    assert response.data["added_at"] == favourite_place.added_at.astimezone(timezone.utc).replace(tzinfo=None).isoformat() + "Z"
+    assert (
+        response.data["added_at"]
+        == favourite_place.added_at.astimezone(timezone.utc)
+        .replace(tzinfo=None)
+        .isoformat()
+        + "Z"
+    )
 
 
 @pytest.mark.django_db
@@ -361,7 +366,9 @@ def test_favourite_place_create(api_client):
 
     url = reverse("favourite-place-list")
     api_client.force_authenticate(user=user)
-    response = api_client.post(url, data={"user": user.id, "place": place.id}, format="json")
+    response = api_client.post(
+        url, data={"user": user.id, "place": place.id}, format="json"
+    )
 
     assert response.status_code == status.HTTP_201_CREATED
     assert FavouritePlace.objects.filter(user=user, place=place).exists()
@@ -379,12 +386,11 @@ def test_favourite_place_delete(api_client):
     assert not FavouritePlace.objects.filter(pk=favourite_place.pk).exists()
 
 
-
 @pytest.mark.django_db
 def test_category_list(api_client):
     # Create some categories using the CategoryFactory
     CategoryFactory.create_batch(5)
-    
+
     url = reverse("category-list")  # Update with your correct URL name
     response = api_client.get(url)
 
@@ -396,7 +402,9 @@ def test_category_list(api_client):
 def test_category_retrieve(api_client):
     category = CategoryFactory()
 
-    url = reverse("category-detail", kwargs={"pk": category.pk})  # Update with your correct URL name
+    url = reverse(
+        "category-detail", kwargs={"pk": category.pk}
+    )  # Update with your correct URL name
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
@@ -407,48 +415,48 @@ def test_category_retrieve(api_client):
 @pytest.mark.django_db
 def test_category_create(api_client):
     # Prepare data for creating a new category
-    data = {
-        "slug": "new-category",
-        "verbose_label": "New Category"
-    }
-    
+    data = {"slug": "new-category", "verbose_label": "New Category"}
+
     url = reverse("category-list")  # Update with your correct URL name
     response = api_client.post(url, data, format="json")
-    
+
     # Check if the category is created successfully
     assert response.status_code == status.HTTP_201_CREATED
     assert response.data["slug"] == data["slug"]
     assert response.data["verbose_label"] == data["verbose_label"]
 
+
 @pytest.mark.django_db
 def test_category_update(api_client):
     # Create a category instance to be updated
     category = CategoryFactory()
-    
+
     # Prepare data for updating the category
-    updated_data = {
-        "slug": "updated-category",
-        "verbose_label": "Updated Category"
-    }
-    
-    url = reverse("category-detail", kwargs={"pk": category.pk})  # Update with your correct URL name
+    updated_data = {"slug": "updated-category", "verbose_label": "Updated Category"}
+
+    url = reverse(
+        "category-detail", kwargs={"pk": category.pk}
+    )  # Update with your correct URL name
     response = api_client.put(url, updated_data, format="json")
-    
+
     # Check if the category is updated correctly
     assert response.status_code == status.HTTP_200_OK
     assert response.data["slug"] == updated_data["slug"]
     assert response.data["verbose_label"] == updated_data["verbose_label"]
 
+
 @pytest.mark.django_db
 def test_category_delete(api_client):
     # Create a category instance to be deleted
     category = CategoryFactory()
-    
-    url = reverse("category-detail", kwargs={"pk": category.pk})  # Update with your correct URL name
+
+    url = reverse(
+        "category-detail", kwargs={"pk": category.pk}
+    )  # Update with your correct URL name
     response = api_client.delete(url)
-    
+
     # Check if the category is deleted
     assert response.status_code == status.HTTP_204_NO_CONTENT
-    
+
     # Check if the category no longer exists
     assert not Category.objects.filter(pk=category.pk).exists()

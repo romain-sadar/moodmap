@@ -119,17 +119,18 @@ def test_visited_place_serializer_valid_data():
     place = PlaceFactory()
     user = UserFactory()
     mood = MoodFactory()
+
     data = {
-        "user": [user.id],  # Wrap user in a list
-        "place": [place.id],  # Wrap place in a list
+        "user": user.id,
+        "place": place.id,
         "visited_time": "2025-02-18T10:00:00Z",
         "mood_feedback": mood.id,
     }
     serializer = VisitedPlaceSerializer(data=data)
     assert serializer.is_valid(), serializer.errors
     visited_place = serializer.save()
-    assert list(visited_place.user.all()) == [user]
-    assert list(visited_place.place.all()) == [place]
+    assert visited_place.user == user
+    assert visited_place.place == place
     assert visited_place.mood_feedback == mood
 
 
