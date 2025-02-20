@@ -69,3 +69,86 @@ class Mood(UUIDModel):
     class Meta:
         verbose_name = "Mood"
         verbose_name_plural = "Moods"
+
+
+class Place(UUIDModel):
+    label = models.CharField(max_length=255, verbose_name="Name")
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    description = models.TextField(blank=True, null=True)
+    category = models.ForeignKey(
+        "Category", on_delete=models.CASCADE, related_name="place"
+    )
+    photo = models.ImageField(upload_to="place_photos/", blank=True, null=True)
+    moods = models.ManyToManyField("Mood", related_name="places", blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.label
+
+    class Meta:
+        verbose_name = "Place"
+        verbose_name_plural = "Places"
+
+
+class VisitedPlace(UUIDModel):
+    user = models.ForeignKey(
+        "User",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="visited_places",
+    )
+    place = models.ForeignKey(
+        "Place",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="visits",
+    )
+    visited_time = models.DateTimeField()
+    mood_feedback = models.ForeignKey(
+        "Mood",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="visited_places",
+    )
+
+    def __str__(self):
+        return f"User {self.user.username} visited {self.place.label} at {self.visited_time}"
+
+    class Meta:
+        verbose_name = "Visited Place"
+        verbose_name_plural = "Visited Places"
+
+
+class FavouritePlace(UUIDModel):
+    user = models.ForeignKey(
+        "User", on_delete=models.CASCADE, related_name="favourite_places"
+    )
+    place = models.ForeignKey(
+        "Place", on_delete=models.CASCADE, related_name="favourites"
+    )
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s favourite: {self.place.label}"
+
+    class Meta:
+        verbose_name = "Favourite Place"
+        verbose_name_plural = "Favourite Places"
+        unique_together = ("user", "place")
+
+
+class Category(UUIDModel):
+    slug = models.SlugField(unique=True)
+    verbose_label = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.verbose_label
+
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"

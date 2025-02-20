@@ -1,10 +1,21 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from api.views import AuthViewSet, MoodViewSet
+from api.views import (
+    AuthViewSet,
+    MoodViewSet,
+    PlaceViewSet,
+    VisitedPlaceViewSet,
+    FavouritePlaceViewSet,
+    CategoryViewSet,
+)
 
 router = DefaultRouter()
 router.register(r"auth", AuthViewSet, basename="auth")
 router.register(r"mood", MoodViewSet, basename="mood")
+router.register(r"place", PlaceViewSet, basename="place")
+router.register(r"visited-place", VisitedPlaceViewSet, basename="visited-place")
+router.register(r"favourite-place", FavouritePlaceViewSet, basename="favourite-place")
+router.register(r"category", CategoryViewSet, basename="category")
 
 urlpatterns = [
     path("", include(router.urls)),

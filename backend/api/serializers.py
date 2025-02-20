@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from api.models import User, Mood
+from api.models import User, Mood, Place, VisitedPlace, FavouritePlace, Category
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -112,3 +112,53 @@ class MoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mood
         fields = ("label",)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ("slug", "verbose_label")
+
+
+class PlaceSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(), slug_field="slug"
+    )
+    moods = serializers.SlugRelatedField(
+        queryset=Mood.objects.all(), slug_field="label", many=True
+    )
+
+    class Meta:
+        model = Place
+        fields = (
+            "label",
+            "latitude",
+            "longitude",
+            "description",
+            "category",
+            "photo",
+            "moods",
+            "created_at",
+            "updated_at",
+        )
+
+
+class VisitedPlaceSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    place = serializers.PrimaryKeyRelatedField(queryset=Place.objects.all())
+    mood_feedback = serializers.PrimaryKeyRelatedField(
+        queryset=Mood.objects.all(), required=False
+    )
+
+    class Meta:
+        model = VisitedPlace
+        fields = ("user", "place", "visited_time", "mood_feedback")
+
+
+class FavouritePlaceSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    place = serializers.PrimaryKeyRelatedField(queryset=Place.objects.all())
+
+    class Meta:
+        model = FavouritePlace
+        fields = ("user", "place", "added_at")
