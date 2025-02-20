@@ -5,6 +5,7 @@ from api.serializers import (
     UserUpdateSerializer,
     UserSerializer,
     MoodSerializer,
+    MoodEntrySerializer,
     PlaceSerializer,
     VisitedPlaceSerializer,
     FavouritePlaceSerializer,
@@ -14,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import action
-from api.models import Mood, Place, VisitedPlace, FavouritePlace, Category
+from api.models import Mood, Place, VisitedPlace, FavouritePlace, Category, MoodEntry
 
 
 class AuthViewSet(viewsets.GenericViewSet):
@@ -97,6 +98,11 @@ class AuthViewSet(viewsets.GenericViewSet):
 class MoodViewSet(viewsets.ModelViewSet):
     serializer_class = MoodSerializer
     queryset = Mood.objects.all()
+
+
+class MoodEntryViewSet(viewsets.ModelViewSet):
+    serializer_class = MoodEntrySerializer
+    queryset = MoodEntry.objects.all().select_related("user", "mood")
 
 
 class PlaceViewSet(viewsets.ModelViewSet):

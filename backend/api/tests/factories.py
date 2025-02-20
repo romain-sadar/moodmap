@@ -1,5 +1,15 @@
 import factory
-from api.models import User, Mood, Place, VisitedPlace, FavouritePlace, Category
+from django.utils.timezone import now
+from api.models import (
+    User,
+    Mood,
+    Place,
+    VisitedPlace,
+    FavouritePlace,
+    Category,
+    MoodEntry,
+    FeelingTag,
+)
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -19,6 +29,23 @@ class MoodFactory(factory.django.DjangoModelFactory):
         model = Mood
 
     label = factory.Faker("pystr")
+
+
+class FeelingTagFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = FeelingTag
+
+    label = factory.Faker("pystr")
+
+
+class MoodEntryFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = MoodEntry
+
+    user = factory.SubFactory(UserFactory)
+    mood = factory.SubFactory(MoodFactory)
+    move_preference = factory.Iterator(["yes", "no"])
+    submitted_at = factory.LazyFunction(now)
 
 
 class PlaceFactory(factory.django.DjangoModelFactory):

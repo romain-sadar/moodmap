@@ -1,12 +1,14 @@
 from datetime import timezone
 import pytest
-from api.models import FavouritePlace, Category
+from api.models import FavouritePlace, Category, MoodEntry
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework.exceptions import ErrorDetail
 from api.tests.factories import (
+    FeelingTagFactory,
     UserFactory,
     MoodFactory,
+    MoodEntryFactory,
     PlaceFactory,
     VisitedPlaceFactory,
     FavouritePlaceFactory,
@@ -460,3 +462,67 @@ def test_category_delete(api_client):
 
     # Check if the category no longer exists
     assert not Category.objects.filter(pk=category.pk).exists()
+
+
+@pytest.mark.django_db
+class TestMoodEntryViewSet:
+    def test_create_mood_entry(self, api_client):
+        """Test creating a new mood entry via API."""
+        user = UserFactory()
+        mood = MoodFactory()
+
+        api_client.force_authenticate(user=user)
+        url = reverse("moodentry-list")
+
+        payload = {
+            "user": user.id,
+            "mood": mood.id,
+            "move_preference": "yes",
+        }
+
+        response = api_client.post(url, payload, format="json")
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert MoodEntry.objects.count() == 1
+        assert MoodEntry.objects.first().user == user
+
+    def test_list_mood_entries(self, api_client):
+        """Test listing all mood entries."""
+        user = UserFactory()
+        mood = MoodFactory()
+        feelings = FeelingTagFactory.create_batch(2)
+        mood_entry = MoodEntryFactory.create(user=user, mood=mood)
+        mood_entry.feelings.set(feelings)
+
+        api_client.force_authenticate(user=user)
+        url = reverse("moodentry-list")
+
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()["results"]) == 1
+        assert "feelings" in response.json()["results"][0]
+
+    def test_retrieve_mood_entry(self, api_client):
+        """Test retrieving a single mood entry."""
+        entry = MoodEntryFactory()
+
+        api_client.force_authenticate(user=entry.user)
+        url = reverse("moodentry-detail", args=[entry.id])
+
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()["id"] == str(entry.id)
+
+    def test_delete_mood_entry(self, api_client):
+        """Test deleting a mood entry."""
+        entry = MoodEntryFactory()
+
+        api_client.force_authenticate(user=entry.user)
+        url = reverse("moodentry-detail", args=[entry.id])
+
+        response = api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert MoodEntry.objects.count() == 0
