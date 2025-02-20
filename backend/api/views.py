@@ -141,6 +141,26 @@ class FavouritePlaceViewSet(viewsets.ModelViewSet):
     serializer_class = FavouritePlaceSerializer
     queryset = FavouritePlace.objects.all()
 
+    def list(self, request, *args, **kwargs):
+        user = request.user
+        favourite_places = FavouritePlace.objects.filter(user=user).select_related(
+            "place__category"
+        )
+
+        grouped_places = {}
+        for fav in favourite_places:
+            category = fav.place.category.verbose_label
+            if category not in grouped_places:
+                grouped_places[category] = []
+            grouped_places[category].append(fav.place)
+
+        grouped_places_serialized = {
+            category: PlaceSerializer(places, many=True).data
+            for category, places in grouped_places.items()
+        }
+
+        return Response(grouped_places_serialized)
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     """
