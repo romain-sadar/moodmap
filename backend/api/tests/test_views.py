@@ -331,14 +331,27 @@ def test_visited_place_delete(api_client):
 @pytest.mark.django_db
 def test_favourite_place_list(api_client):
     user = UserFactory()
-    FavouritePlaceFactory.create_batch(3, user=user)
+    category1 = Category.objects.create(slug="category1", verbose_label="Category 1")
+    category2 = Category.objects.create(slug="category2", verbose_label="Category 2")
+
+    place1 = PlaceFactory(category=category1)
+    place2 = PlaceFactory(category=category1)
+    place3 = PlaceFactory(category=category2)
+
+    FavouritePlaceFactory.create(user=user, place=place1)
+    FavouritePlaceFactory.create(user=user, place=place2)
+    FavouritePlaceFactory.create(user=user, place=place3)
 
     url = reverse("favourite-place-list")
     api_client.force_authenticate(user=user)
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data["results"]) == 3
+
+    assert "Category 1" in response.data
+    assert "Category 2" in response.data
+    assert len(response.data["Category 1"]) == 2
+    assert len(response.data["Category 2"]) == 1
 
 
 @pytest.mark.django_db
