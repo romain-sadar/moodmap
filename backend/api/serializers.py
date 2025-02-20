@@ -1,6 +1,15 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from api.models import User, Mood, Place, VisitedPlace, FavouritePlace, Category
+from api.models import (
+    User,
+    Mood,
+    MoodEntry,
+    Place,
+    VisitedPlace,
+    FavouritePlace,
+    Category,
+    FeelingTag,
+)
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -112,6 +121,29 @@ class MoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mood
         fields = ("label",)
+
+
+class FeelingTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeelingTag
+        fields = ["id", "label"]
+
+
+class MoodEntrySerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    mood = serializers.PrimaryKeyRelatedField(queryset=Mood.objects.all())
+    feelings = FeelingTagSerializer(many=True, required=False)
+
+    class Meta:
+        model = MoodEntry
+        fields = [
+            "id",
+            "user",
+            "mood",
+            "feelings",
+            "move_preference",
+            "submitted_at",
+        ]
 
 
 class CategorySerializer(serializers.ModelSerializer):

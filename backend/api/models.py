@@ -71,6 +71,39 @@ class Mood(UUIDModel):
         verbose_name_plural = "Moods"
 
 
+class MoodEntry(UUIDModel):
+    user = models.ForeignKey(
+        "User", on_delete=models.CASCADE, related_name="mood_entries"
+    )
+    mood = models.ForeignKey(
+        "Mood", on_delete=models.CASCADE, related_name="mood_entries"
+    )
+    move_preference = models.CharField(
+        max_length=10,
+        choices=[("yes", "Yes, why not"), ("no", "No, I prefer not")],
+        null=True,
+        blank=True,
+    )
+    feelings = models.ManyToManyField(
+        "FeelingTag", blank=True, related_name="mood_entries"
+    )
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} felt {self.mood.label} on {self.submitted_at}"
+
+    class Meta:
+        verbose_name = "Mood Entry"
+        verbose_name_plural = "Mood Entries"
+
+
+class FeelingTag(UUIDModel):
+    label = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.label
+
+
 class Place(UUIDModel):
     label = models.CharField(max_length=255, verbose_name="Name")
     latitude = models.FloatField()
