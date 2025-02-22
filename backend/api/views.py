@@ -10,12 +10,15 @@ from api.serializers import (
     VisitedPlaceSerializer,
     FavouritePlaceSerializer,
     CategorySerializer,
+    ActivitySerializer,
+    ActivityCategorySerializer
 )
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import action
 from api.models import Mood, Place, VisitedPlace, FavouritePlace, Category, MoodEntry
+from api.models import Mood, Activity, ActivityCategory
 
 
 class AuthViewSet(viewsets.GenericViewSet):
@@ -149,3 +152,40 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
+
+class ActivityViewSet(viewsets.ModelViewSet):
+    """
+    A ViewSet for handling Activities.
+    """
+
+    serializer_class = ActivitySerializer
+    queryset = Activity.objects.all()
+
+    @action(detail=True, methods=["get"], url_path="category")
+    def get_category(self, request, pk=None):
+        """
+        Returns the category associated with an activity.
+        """
+        activity = self.get_object()
+        category = activity.category
+        category_serializer = CategorySerializer(category)
+        return Response(category_serializer.data)
+
+    @action(detail=True, methods=["get"], url_path="moods")
+    def get_moods(self, request, pk=None):
+        """
+        Returns the moods associated with an activity.
+        """
+        activity = self.get_object()
+        moods = activity.moods.all()
+        mood_serializer = MoodSerializer(moods, many=True)
+        return Response(mood_serializer.data)
+
+
+class ActivityCategoryViewSet(viewsets.ModelViewSet):
+    """
+    A ViewSet for handling ActivityCategories.
+    """
+
+    serializer_class = ActivityCategorySerializer
+    queryset = ActivityCategory.objects.all()

@@ -8,6 +8,8 @@ from api.views import (
     VisitedPlaceViewSet,
     FavouritePlaceViewSet,
     CategoryViewSet,
+    ActivityViewSet,  
+    ActivityCategoryViewSet,  
 )
 
 router = DefaultRouter()
@@ -18,6 +20,8 @@ router.register(r"place", PlaceViewSet, basename="place")
 router.register(r"visited-place", VisitedPlaceViewSet, basename="visited-place")
 router.register(r"favourite-place", FavouritePlaceViewSet, basename="favourite-place")
 router.register(r"category", CategoryViewSet, basename="category")
+router.register(r"activity", ActivityViewSet, basename="activity")  
+router.register(r"activity-category", ActivityCategoryViewSet, basename="activity-category")  
 
 urlpatterns = [
     path("", include(router.urls)),

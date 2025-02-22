@@ -1,10 +1,11 @@
 from datetime import timezone
 import pytest
-from api.models import FavouritePlace, Category, MoodEntry
+from api.models import Activity, FavouritePlace, Category, MoodEntry, ActivityCategory
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework.exceptions import ErrorDetail
 from api.tests.factories import (
+    ActivityFactory,
     FeelingTagFactory,
     UserFactory,
     MoodFactory,
@@ -13,6 +14,8 @@ from api.tests.factories import (
     VisitedPlaceFactory,
     FavouritePlaceFactory,
     CategoryFactory,
+    ActivityFactory,
+    ActivityCategoryFactory
 )
 from django.urls import reverse
 
@@ -526,3 +529,178 @@ class TestMoodEntryViewSet:
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert MoodEntry.objects.count() == 0
+
+
+
+@pytest.mark.django_db
+class TestActivityCategoryViewSet:
+
+    def test_create_activity_category(self, api_client):
+        """Test creating a new activity category via API."""
+        user = UserFactory()
+
+        api_client.force_authenticate(user=user)
+        url = reverse("activity-category-list")
+
+        data = {
+            "slug": "adventure",
+            "verbose_label": "Adventure Activities",
+        }
+
+        response = api_client.post(url, data, format="json")
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert ActivityCategory.objects.count() == 1
+        assert response.data["slug"] == data["slug"]
+        assert response.data["verbose_label"] == data["verbose_label"]
+
+    def test_list_activity_categories(self, api_client):
+        """Test listing all activity categories."""
+        user = UserFactory()
+        ActivityCategoryFactory.create_batch(3)
+
+        api_client.force_authenticate(user=user)
+        url = reverse("activity-category-list")
+
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data["results"]) == 3
+
+    def test_retrieve_activity_category(self, api_client):
+        """Test retrieving a single activity category."""
+        category = ActivityCategoryFactory()
+
+        user = UserFactory()
+        api_client.force_authenticate(user=user)
+        url = reverse("activity-category-detail", kwargs={"pk": category.pk})
+
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["slug"] == category.slug
+        assert response.data["verbose_label"] == category.verbose_label
+
+    def test_update_activity_category(self, api_client):
+        """Test updating an activity category."""
+        category = ActivityCategoryFactory()
+
+        user = UserFactory()
+        api_client.force_authenticate(user=user)
+        url = reverse("activity-category-detail", kwargs={"pk": category.pk})
+        updated_data = {
+            "slug": "updated-adventure",
+            "verbose_label": "Updated Adventure Activities",
+        }
+
+        response = api_client.put(url, updated_data, format="json")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["slug"] == updated_data["slug"]
+        assert response.data["verbose_label"] == updated_data["verbose_label"]
+
+    def test_delete_activity_category(self, api_client):
+        """Test deleting an activity category."""
+        category = ActivityCategoryFactory()
+
+        user = UserFactory()
+        api_client.force_authenticate(user=user)
+        url = reverse("activity-category-detail", kwargs={"pk": category.pk})
+        response = api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert not ActivityCategory.objects.filter(pk=category.pk).exists()
+
+
+@pytest.mark.django_db
+class TestActivityViewSet:
+
+    def test_create_activity(self, api_client):
+        """Test creating a new activity via API."""
+        user = UserFactory()
+        category = ActivityCategoryFactory()
+        moods = MoodFactory.create_batch(2)  # Create some moods for the activity
+
+        api_client.force_authenticate(user=user)
+        url = reverse("activity-list")
+
+        data = {
+            "name": "Skydiving",
+            "description": "Jump from an airplane",
+            "category": category.id,
+            "moods": [mood.id for mood in moods],
+        }
+
+        response = api_client.post(url, data, format="json")
+        print(response.data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert Activity.objects.count() == 1
+        assert response.data["name"] == data["name"]
+        assert response.data["description"] == data["description"]
+        assert response.data["category"] == category.id
+
+    def test_list_activities(self, api_client):
+        """Test listing all activities."""
+        user = UserFactory()
+        category = ActivityCategoryFactory()
+        ActivityFactory.create_batch(3, category=category)
+
+        # api_client.force_authenticate(user=user)
+        url = reverse("activity-list")
+
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data["results"]) == 3
+
+    def test_retrieve_activity(self, api_client):
+        """Test retrieving a single activity."""
+        activity = ActivityFactory()
+
+        url = reverse("activity-detail", kwargs={"pk": activity.pk})
+
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["name"] == activity.name
+        assert response.data["description"] == activity.description
+        assert response.data["category"] == activity.category.id
+
+    def test_update_activity(self, api_client):
+        """Test updating an activity."""
+        # Create an activity and some moods
+        activity = ActivityFactory()
+        moods = MoodFactory.create_batch(2)  # Create 2 moods for the activity
+
+        # Prepare the updated data, including the `moods` field
+        updated_data = {
+            "name": "Bungee Jumping",
+            "description": "Jump off a bridge with a bungee cord",
+            "category": activity.category.id,
+            "moods": [mood.id for mood in moods],  # Include the moods in the update
+        }
+
+        # Get the URL for the activity detail view
+        url = reverse("activity-detail", kwargs={"pk": activity.pk})
+
+        # Send a PUT request to update the activity
+        response = api_client.put(url, updated_data, format="json")
+
+        # Assert the response status code and data
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["name"] == updated_data["name"]
+        assert response.data["description"] == updated_data["description"]
+        assert response.data["category"] == activity.category.id
+        assert len(response.data["moods"]) == 2  # Ensure the moods are updated
+
+    def test_delete_activity(self, api_client):
+        """Test deleting an activity."""
+        activity = ActivityFactory()
+
+        url = reverse("activity-detail", kwargs={"pk": activity.pk})
+
+        response = api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert not Activity.objects.filter(pk=activity.pk).exists()

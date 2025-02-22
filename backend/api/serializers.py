@@ -9,7 +9,10 @@ from api.models import (
     FavouritePlace,
     Category,
     FeelingTag,
+    ActivityCategory,
+    Activity
 )
+from api.models import User, Mood, Activity, ActivityCategory
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -194,3 +197,36 @@ class FavouritePlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = FavouritePlace
         fields = ("user", "place", "added_at")
+
+
+class ActivitySerializer(serializers.ModelSerializer):
+    category = serializers.PrimaryKeyRelatedField(queryset=ActivityCategory.objects.all())  
+    moods = serializers.PrimaryKeyRelatedField(queryset=Mood.objects.all(), many=True)  
+    
+    class Meta:
+        model = Activity
+        fields = (
+            "id", "name", "description", "category", "moods", "duration", "image"
+        )
+        read_only_fields = ("id",)
+    
+    def validate_name(self, value):
+        """
+        Ensure the activity name is unique.
+        """
+        if Activity.objects.filter(name=value).exists():
+            raise serializers.ValidationError("An activity with this name already exists.")
+        return value
+
+class ActivityCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityCategory
+        fields = ("slug", "verbose_label")
+
+    def validate_slug(self, value):
+        """
+        Ensure the slug is unique.
+        """
+        if ActivityCategory.objects.filter(slug=value).exists():
+            raise serializers.ValidationError("A category with this slug already exists.")
+        return value

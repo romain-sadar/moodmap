@@ -9,7 +9,10 @@ from api.models import (
     Category,
     MoodEntry,
     FeelingTag,
+    Activity,
+    ActivityCategory
 )
+from api.models import User, Mood, ActivityCategory, Activity
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -91,6 +94,23 @@ class FavouritePlaceFactory(factory.django.DjangoModelFactory):
 class CategoryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Category
+
+    slug = factory.Faker("slug")
+    verbose_label = factory.Faker("word")
+
+
+class ActivityFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Activity
+
+    name = factory.Faker("word")
+    description = factory.Faker("paragraph")
+    category = factory.SubFactory("api.tests.factories.ActivityCategoryFactory")
+
+
+class ActivityCategoryFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ActivityCategory
 
     slug = factory.Faker("slug")
     verbose_label = factory.Faker("word")
