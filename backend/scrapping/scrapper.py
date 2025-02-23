@@ -1,161 +1,82 @@
+import pandas as pd
+import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-import time
-import pandas as pd
 
-# Configuration de Selenium
+# 📌 Configuration de Selenium
 options = webdriver.ChromeOptions()
-options.add_argument("--headless")  # Exécute en arrière-plan
+options.add_argument("--headless")  # Exécution en arrière-plan (optionnel)
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
+
+# 🔥 Lance le WebDriver Chrome
 driver = webdriver.Chrome(options=options)
 
-# Liste mise à jour des lieux par catégorie (remplacement des lieux problématiques)
-places = {
-    "Café": [
-        "Toby's Estate Singapore",
-        "The Populus",
-        "Jimmy Monkey Cafe",
-        "Dapper Coffee",
-        "Glasshouse Cafe",
-        "The Lokal",
-        "Sarnies",
-        "Craftsmen Specialty Coffee",
-        "Alchemist",
-        "Dutch Colony Coffee Co.",
-    ],
-    "Bar": [
-        "Jekyll & Hyde",
-        "The Secret Mermaid",
-        "D.Bespoke",
-        "MO Bar",
-        "Highball",
-        "The Whiskey Library",
-        "Smoke & Mirrors",
-        "Nutmeg & Clove",
-        "The Other Room",
-        "Idlewild",
-    ],
-    "Place of Worship": [
-        "St Joseph's Church",
-        "Church of Saints Peter and Paul",
-        "Church of Our Lady of Lourdes",
-        "Abdul Gaffoor Mosque",
-        "Sri Srinivasa Perumal Temple",
-        "Wat Ananda Metyarama Thai Buddhist Temple",
-        "Sakya Muni Buddha Gaya Temple",
-        "Chesed-El Synagogue",
-        "Central Sikh Temple",
-        "Foo Hai Ch'an Monastery",
-    ],
-    "Park": [
-        "Jurong Lake Gardens",
-        "Bukit Timah Nature Reserve",
-        "Southern Ridges",
-        "Sungei Buloh Wetland Reserve",
-        "Kranji Marshes",
-        "West Coast Park",
-        "Pasir Ris Park",
-        "Changi Beach Park",
-        "Pulau Ubin",
-        "Lower Peirce Reservoir Park",
-    ],
-    "Gym": [
-        "The Strength Yard",
-        "Genesis Gym",
-        "Body Fit Training",
-        "Elevate Performance Gym",
-        "ActiveSG Gym",
-        "Revolution Singapore",
-        "Barry’s Bootcamp",
-        "Yoga Movement",
-        "Pure Yoga",
-        "Gold’s Gym Singapore",
-    ],
-    "Coworking": [
-        "The Executive Centre",
-        "Ucommune Singapore",
-        "Workbuddy",
-        "Gather Cowork",
-        "Core Collective",
-        "One&Co Singapore",
-        "Garage Society",
-        "T-Hub Singapore",
-        "Impact Hub Singapore",
-        "O2Work",
-    ],
-    "Library": [
-        "library@chinatown",
-        "library@harbourfront",
-        "Toa Payoh Public Library",
-        "Ang Mo Kio Public Library",
-        "Clementi Public Library",
-        "Serangoon Public Library",
-        "Yishun Public Library",
-        "Pasir Ris Public Library",
-        "Geylang East Public Library",
-        "Sembawang Public Library",
-    ],
-}
+# 📂 Charger le fichier CSV contenant les lieux et leurs URLs
+file_path = "/Users/erwanhamza/moodmap/backend/places_singapore.csv"  # Mets ici le bon chemin vers ton fichier CSV
+df_places = pd.read_csv(file_path)
 
+# 📌 Vérification des colonnes attendues
+if "label" not in df_places.columns or "link" not in df_places.columns:
+    raise ValueError("Le fichier CSV doit contenir les colonnes 'label' et 'link'.")
 
-# Fonction pour scraper les infos d'un lieu sur Google Maps
-def scrape_google_maps(place_name, category):
-    search_url = (
-        f"https://www.google.com/maps/search/{place_name.replace(' ', '+')}+Singapore/"
-    )
-    driver.get(search_url)
-    time.sleep(2)  # Réduction du temps d'attente pour optimiser la vitesse
+# 🏢 Liste des lieux avec leurs URLs
+places_urls = df_places[['label', 'link']].dropna().to_dict(orient='records')
+
+# 🔍 Fonction pour scraper les avis
+def get_google_reviews(place):
+    driver.get(place["link"])
+    time.sleep(5)  # Laisse le temps de charger la page
 
     try:
-        # Vérifier si l'élément principal (nom) est présent
-        try:
-            label = driver.find_element(By.TAG_NAME, "h1").text
-        except:
-            print(f"❌ Lieu introuvable : {place_name}. Il sera ignoré.")
-            return None
+        # ✅ Trouver et cliquer sur le bouton "Avis"
+        reviews_button = driver.find_element(By.XPATH, '//button[contains(@aria-label, "avis")]')
+        reviews_button.click()
+        time.sleep(3)
 
-        # Récupérer la latitude et la longitude depuis l'URL
-        try:
-            url = driver.current_url
-            coords = url.split("/@")[1].split(",")[:2]
-            latitude, longitude = coords[0], coords[1]
-        except:
-            latitude, longitude = "Unknown", "Unknown"
+        # ✅ Scroller pour charger plus d'avis
+        scrollable_div = driver.find_element(By.XPATH, '//div[contains(@class, "m6QErb")]')
+        for _ in range(5):  # Ajuster le nombre de scrolls si besoin
+            driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", scrollable_div)
+            time.sleep(2)
 
-        # Récupérer la description (parfois indisponible)
-        try:
-            description = driver.find_element(
-                By.XPATH, "//div[contains(@class, 'TIHn2')]"
-            ).text
-        except:
-            description = "No description available"
+        # ✅ Extraction des avis
+        reviews = []
+        review_elements = driver.find_elements(By.XPATH, '//div[contains(@class, "jftiEf fontBodyMedium")]')
 
-        return {
-            "label": label,
-            "latitude": latitude,
-            "longitude": longitude,
-            "description": description,
-            "category": category,
-        }
+        for review in review_elements[:10]:  # Récupérer entre 5 et 10 avis
+            try:
+                author = review.find_element(By.XPATH, './/div[contains(@class, "d4r55")]').text
+                rating = review.find_element(By.XPATH, './/span[contains(@class, "kvMYJc")]').get_attribute("aria-label")
+                review_text = review.find_element(By.XPATH, './/span[contains(@class, "wiI7pd")]').text
+                reviews.append({
+                    "place": place["label"],
+                    "author": author,
+                    "rating": rating,
+                    "review": review_text
+                })
+            except:
+                continue
 
+        return reviews
     except Exception as e:
-        print(f"⚠️ Erreur pour {place_name} : {e}")
+        print(f"⚠️ Erreur lors du scraping de {place['label']} : {e}")
         return None
 
+# 📊 Stocker les résultats
+all_reviews = []
+for place in places_urls:
+    print(f"📍 Scraping : {place['label']}")
+    reviews = get_google_reviews(place)
+    if reviews:
+        all_reviews.extend(reviews)
+    time.sleep(2)  # Pause pour éviter le blocage
 
-# Stocker les données
-data = []
-for category, place_list in places.items():
-    for place in place_list:
-        result = scrape_google_maps(place, category)
-        if result:
-            data.append(result)
+# 📝 Convertir en DataFrame et sauvegarder en CSV
+df_reviews = pd.DataFrame(all_reviews)
+df_reviews.to_csv("google_reviews.csv", index=False, encoding="utf-8")
 
-# Convertir en DataFrame et sauvegarder en CSV
-df = pd.DataFrame(data)
-df.to_csv("places_singapore.csv", index=False, encoding="utf-8")
-print("\n✅ Données sauvegardées avec succès dans places_singapore.csv !")
+print("\n✅ Avis sauvegardés avec succès dans 'google_reviews.csv' !")
 
-# Fermer Selenium
+# 🔴 Fermeture du navigateur Selenium
 driver.quit()
