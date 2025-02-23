@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:duration_picker/duration_picker.dart';
+import 'package:moodmap/core/themes.dart';
 
 enum Mood {
   verySad("😢", "Very Sad"),
@@ -100,7 +101,7 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
               Navigator.of(context).pop(); 
             },
              style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue, 
+              backgroundColor: AppTheme.blue, 
               foregroundColor: Colors.white, 
             ),
             child: Text("Yes"),
@@ -124,15 +125,15 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
             child: Text("Skip", style: TextStyle(color: Colors.white, fontSize: 16)),
           )
         ],
-        backgroundColor: Colors.blue,
+        backgroundColor: AppTheme.blue,
         elevation: 0,
       ),
       body: Stack(
         children: [
           
           Container(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            color: Colors.blue,
+            padding: EdgeInsets.symmetric(vertical: 5),
+            color: AppTheme.blue,
             child: Column(
               children: [
                 Text("How did you feel at this place ?", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
@@ -167,7 +168,7 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
           ),
              
           Positioned(
-            top: 275, 
+            top: 255, 
             left: 0,
             right: 0,
             bottom: 0,
@@ -183,7 +184,7 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Describe how you felt at this place.", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height:10),
+                    SizedBox(height:5),
                     Wrap(
                       spacing: 10,
                       children: _moodValue.tags.map((tag) {
@@ -194,25 +195,25 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
                             label: Text(tag),
                             selected: isSelected,
                             onSelected: (selected) => toggleTag(tag),
-                            selectedColor: Colors.blue,
+                            selectedColor: AppTheme.blue,
                             backgroundColor: Colors.white,
-                            labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.blue),
-                            shape: StadiumBorder(side: BorderSide(color: Colors.blue)),
+                            labelStyle: TextStyle(color: isSelected ? Colors.white : AppTheme.blue),
+                            shape: StadiumBorder(side: BorderSide(color: AppTheme.blue)),
                             showCheckmark: false,
                           ),
                         );
                       }).toList(),
                     ),
                             
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                             
                    Text("How long did you stay here?", style: TextStyle( fontSize: 18,fontWeight: FontWeight.bold)),
-                  SizedBox(height: 10),
+                  SizedBox(height: 5),
                   Center(
                       child: ElevatedButton(
                         onPressed: _pickDuration,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
+                          backgroundColor: AppTheme.blue,
                           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                         ),
                         child: Text(
@@ -223,25 +224,22 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
                     ), Spacer(),
                             
                     
-                    Padding(
-                      padding: const EdgeInsets.only(bottom:20.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _showFavoriteDialog(context);
-                            print("Mood: ${_moodValue.label}");
-                            print("Selected Tags: $selectedTags");
-                            print("Time: $_selectedDuration");
-                            print("Favorite: $favorites");
-
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                          ),
-                          child: Text("Let's go →", style: TextStyle(fontSize: 18, color: Colors.white)),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _showFavoriteDialog(context);
+                          print("Mood: ${_moodValue.label}");
+                          print("Selected Tags: $selectedTags");
+                          print("Time: $_selectedDuration");
+                          print("Favorite: $favorites");
+                    
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.blue,
+                          padding: EdgeInsets.symmetric(vertical: 10),
                         ),
+                        child: Text("Let's go →", style: TextStyle(fontSize: 18, color: Colors.white)),
                       ),
                     ),
                   ],
@@ -252,14 +250,14 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
         
           
           Positioned(
-            top: 275,
+            top: 255,
             left: 0,
             right: 0,
             child: ClipPath(
               clipper: OvalClipper(),
               child: Container(
                 height: 55,
-                color: Colors.blue,
+                color: AppTheme.blue,
               ),
             ),
           ),

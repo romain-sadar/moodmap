@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moodmap/core/themes.dart';
 
 enum Mood {
   verySad("😢", "Very Sad"),
@@ -27,6 +28,11 @@ enum Mood {
   }
 }
 class MoodFormScreen extends StatefulWidget {
+   final VoidCallback goToHome; // Fonction à appeler pour revenir à l'écran d'accueil
+
+  // Constructor
+  MoodFormScreen({required this.goToHome});
+
   @override
   _MoodFormScreenState createState() => _MoodFormScreenState();
 }
@@ -55,20 +61,20 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              // Action du bouton Skip
+             widget.goToHome();
             },
             child: Text("Skip", style: TextStyle(color: Colors.white, fontSize: 16)),
           )
         ],
-        backgroundColor: Colors.blue,
+        backgroundColor: AppTheme.blue,
         elevation: 0,
       ),
       body: Stack(
         children: [
           // Fond bleu avec le slider et texte
           Container(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            color: Colors.blue,
+            padding: EdgeInsets.symmetric(vertical: 5),
+            color: AppTheme.blue,
             child: Column(
               children: [
                 Text("How do you feel?", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
@@ -103,7 +109,7 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
           ),
              // Bloc blanc avec "Describe your feelings"
           Positioned(
-            top: 275, // Positionne le bloc blanc sous l'ovale
+            top: 255, 
             left: 0,
             right: 0,
             bottom: 0,
@@ -119,7 +125,7 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Describe your feelings", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height:10),
+                    SizedBox(height:5),
                     Wrap(
                       spacing: 10,
                       children: _moodValue.tags.map((tag) {
@@ -130,38 +136,40 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
                             label: Text(tag),
                             selected: isSelected,
                             onSelected: (selected) => toggleTag(tag),
-                            selectedColor: Colors.blue,
+                            selectedColor: AppTheme.blue,
                             backgroundColor: Colors.white,
-                            labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.blue),
-                            shape: StadiumBorder(side: BorderSide(color: Colors.blue)),
+                            labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black),
+                            shape: StadiumBorder(side: BorderSide(color: AppTheme.blue)),
                             showCheckmark: false,
                           ),
                         );
                       }).toList(),
                     ),
                             
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                             
-                    // Bloc blanc avec "Do you want to move somewhere?"
+                    
                     Text("Do you want to move somewhere?", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height:10),
+                    SizedBox(height:5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: wantsToMove ? Colors.blue : Colors.grey[300],
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: wantsToMove ? AppTheme.blue : Colors.white,
                             foregroundColor: wantsToMove ? Colors.white : Colors.black,
+                            shape: StadiumBorder(side: BorderSide(color: AppTheme.blue)),
                             
                           ),
                           onPressed: () => setState(() => wantsToMove = true),
                           child: Text("Yes"),
                         ),
                         SizedBox(width: 10),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: !wantsToMove ? Colors.blue : Colors.grey[300],
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: !wantsToMove ? AppTheme.blue : Colors.white,
                             foregroundColor: !wantsToMove ? Colors.white : Colors.black,
+                            shape: StadiumBorder(side: BorderSide(color: AppTheme.blue)),
                           ),
                           onPressed: () => setState(() => wantsToMove = false),
                           child: Text("No"),
@@ -169,25 +177,22 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
                       ],
                     ),
                             
+                  
                     Spacer(),
-                            
-                    // Bouton Submit
-                    Padding(
-                      padding: const EdgeInsets.only(bottom:20.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            print("Mood: ${_moodValue.label}");
-                            print("Selected Tags: $selectedTags");
-                            print("Wants to Move: $wantsToMove");
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                          ),
-                          child: Text("Let's go →", style: TextStyle(fontSize: 18, color: Colors.white)),
+                   
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          print("Mood: ${_moodValue.label}");
+                          print("Selected Tags: $selectedTags");
+                          print("Wants to Move: $wantsToMove");
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.blue,
+                          padding: EdgeInsets.symmetric(vertical: 10),
                         ),
+                        child: Text("Let's go →", style: TextStyle(fontSize: 18, color: Colors.white)),
                       ),
                     ),
                   ],
@@ -196,16 +201,16 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
             ),
           ),
         
-          // Ovale blanc au-dessus du bleu
+         
           Positioned(
-            top: 275,
+            top: 255,
             left: 0,
             right: 0,
             child: ClipPath(
               clipper: OvalClipper(),
               child: Container(
                 height: 55,
-                color: Colors.blue,
+                color: AppTheme.blue,
               ),
             ),
           ),
