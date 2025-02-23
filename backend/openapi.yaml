@@ -1,10 +1,10 @@
 openapi: 3.0.3
 info:
-  title: User Authentication API
+  title: User Authentication and Mood API
   version: 1.0.0
-  description: API endpoints for user authentication including registration and login.
+  description: API endpoints for user authentication and mood management, including registration, login, and mood operations.
 paths:
-  /register/:
+  /auth/register/:
     post:
       summary: Register a new user
       operationId: registerUser
@@ -20,10 +20,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user_id:
+                    type: string
+                    format: uuid
         "400":
           description: Invalid input
-  /login/:
+  /auth/login/:
     post:
       summary: Login user
       operationId: loginUser
@@ -35,13 +41,121 @@ paths:
               $ref: '#/components/schemas/UserLogin'
       responses:
         "200":
-          description: Login successful
+          description: Login successful and JWT tokens returned
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResponse'
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/UserResponse'
+                  tokens:
+                    type: object
+                    properties:
+                      refresh:
+                        type: string
+                      access:
+                        type: string
         "400":
           description: Invalid credentials or inactive user
+  /mood/:
+    get:
+      summary: List all moods
+      operationId: listMoods
+      responses:
+        "200":
+          description: A list of moods
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MoodResponse'
+    post:
+      summary: Create a new mood
+      operationId: createMood
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoodRequest'
+      responses:
+        "201":
+          description: Mood created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoodResponse'
+        "400":
+          description: Invalid input
+  /mood/{id}/:
+    get:
+      summary: Retrieve a specific mood
+      operationId: retrieveMood
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: A specific mood
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoodResponse'
+        "404":
+          description: Mood not found
+    put:
+      summary: Update a specific mood
+      operationId: updateMood
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoodRequest'
+      responses:
+        "200":
+          description: Mood updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoodResponse'
+        "400":
+          description: Invalid input
+        "404":
+          description: Mood not found
+    delete:
+      summary: Delete a specific mood
+      operationId: deleteMood
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Mood deleted successfully
+        "404":
+          description: Mood not found
 components:
   schemas:
     UserRegistration:
@@ -94,3 +208,19 @@ components:
               type: string
             access:
               type: string
+    MoodRequest:
+      type: object
+      properties:
+        label:
+          type: string
+          maxLength: 50
+          nullable: true
+    MoodResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        label:
+          type: string
+          nullable: true
