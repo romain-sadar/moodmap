@@ -12,17 +12,13 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
-  int _selectedIndex = 0; // Index de l'icône sélectionné
+  
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: _selectedIndex,
+      currentIndex: widget.selectedIndex,
       onTap: (index) {
         widget.onTabSelected(index);
       },
@@ -34,19 +30,25 @@ class _NavBarState extends State<NavBar> {
       iconSize: 30,
       items: [ 
         BottomNavigationBarItem(
-          icon: Icon(_selectedIndex == 0 ? Icons.home : Icons.home_outlined),
+          icon: Icon(widget.selectedIndex == 0 ? Icons.home : Icons.home_outlined),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Icon(_selectedIndex == 1 ? Icons.mood : Icons.mood_outlined),
+          icon: widget.selectedIndex == 1 
+              ? Image.asset(
+                  'assets/images/mood.png', 
+                  width: 30,
+                  height: 30,
+                )
+              : Icon(Icons.mood), 
           label: '',
         ),
          BottomNavigationBarItem(
-          icon: Icon(_selectedIndex == 2 ? Icons.favorite : Icons.favorite_outline),
+          icon: Icon(widget.selectedIndex == 2 ? Icons.favorite : Icons.favorite_outline),
           label: '',
         ),
          BottomNavigationBarItem(
-          icon: Icon(_selectedIndex == 3 ? Icons.person : Icons.person_outline),
+          icon: Icon(widget.selectedIndex == 3 ? Icons.person : Icons.person_outline),
           label: '',
         ),
       ],
