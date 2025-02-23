@@ -9,6 +9,9 @@ from api.models import (
     Category,
     MoodEntry,
     FeelingTag,
+    Activity,
+    ActivityCategory,
+    FavouriteActivity,
 )
 
 
@@ -94,3 +97,29 @@ class CategoryFactory(factory.django.DjangoModelFactory):
 
     slug = factory.Faker("slug")
     verbose_label = factory.Faker("word")
+
+
+class ActivityFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Activity
+
+    name = factory.Faker("word")
+    description = factory.Faker("paragraph")
+    category = factory.SubFactory("api.tests.factories.ActivityCategoryFactory")
+
+
+class ActivityCategoryFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ActivityCategory
+
+    slug = factory.Faker("slug")
+    verbose_label = factory.Faker("word")
+
+
+class FavouriteActivityFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = FavouriteActivity
+
+    user = factory.SubFactory("api.tests.factories.UserFactory")
+    activity = factory.SubFactory("api.tests.factories.ActivityFactory")
+    added_at = factory.Faker("date_time_this_year")
