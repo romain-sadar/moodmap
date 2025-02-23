@@ -7,7 +7,6 @@ from api.tests.factories import (
     CategoryFactory,
     MoodFactory,
     ActivityCategoryFactory,
-    ActivityCategory
 )
 from django.core.files.uploadedfile import SimpleUploadedFile
 from api.serializers import (
@@ -18,7 +17,7 @@ from api.serializers import (
     CategorySerializer,
     MoodSerializer,
     ActivitySerializer,
-    ActivityCategorySerializer
+    ActivityCategorySerializer,
 )
 from io import BytesIO
 from PIL import Image

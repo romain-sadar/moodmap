@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, response
 from api.serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
@@ -11,14 +11,25 @@ from api.serializers import (
     FavouritePlaceSerializer,
     CategorySerializer,
     ActivitySerializer,
-    ActivityCategorySerializer
+    ActivityCategorySerializer,
+    FavouriteActivitySerializer,
+    FavouritesGroupedByMoodSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import action
-from api.models import Mood, Place, VisitedPlace, FavouritePlace, Category, MoodEntry
-from api.models import Mood, Activity, ActivityCategory
+from api.models import (
+    Mood,
+    Place,
+    VisitedPlace,
+    FavouritePlace,
+    Category,
+    MoodEntry,
+    FavouriteActivity,
+)
+from api.models import Activity, ActivityCategory
+from django.db.models import Prefetch
 
 
 class AuthViewSet(viewsets.GenericViewSet):
@@ -153,6 +164,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
 
+
 class ActivityViewSet(viewsets.ModelViewSet):
     """
     A ViewSet for handling Activities.
@@ -189,3 +201,61 @@ class ActivityCategoryViewSet(viewsets.ModelViewSet):
 
     serializer_class = ActivityCategorySerializer
     queryset = ActivityCategory.objects.all()
+
+
+class FavouriteActivityViewSet(viewsets.ModelViewSet):
+    """
+    A ViewSet for handling FavouritePlaces.
+    """
+
+    serializer_class = FavouriteActivitySerializer
+    queryset = FavouriteActivity.objects.all()
+
+
+class FavouritesGroupedByMoodViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = FavouritesGroupedByMoodSerializer
+
+    def get_queryset(self):
+        return FavouritePlace.objects.none()
+
+    def list(self, request):
+        user = request.user
+
+        # Fetch favorite places and activities for the current user
+        favourite_places = FavouritePlace.objects.filter(user=user).prefetch_related(
+            Prefetch("place__moods"), "place__category"
+        )
+
+        favourite_activities = FavouriteActivity.objects.filter(
+            user=user
+        ).prefetch_related(Prefetch("activity__moods"), "activity__category")
+
+        # Group favourites by mood
+        favourites_by_mood = []
+
+        self._group_favourites(favourite_places, favourites_by_mood, "place")
+        self._group_favourites(favourite_activities, favourites_by_mood, "activity")
+
+        # Serialize the grouped data
+        serializer = FavouritesGroupedByMoodSerializer(favourites_by_mood, many=True)
+        return response.Response(serializer.data)
+
+    def _group_favourites(self, favourites, group_list, relation_type):
+        for favourite in favourites:
+            related_obj = getattr(favourite, relation_type)
+            moods = related_obj.moods.all()
+
+            for mood in moods:
+                mood_entry = next(
+                    (entry for entry in group_list if entry["mood"] == mood.label), None
+                )
+
+                if not mood_entry:
+                    mood_entry = {"mood": mood.label, "places": [], "activities": []}
+                    group_list.append(mood_entry)
+
+                if relation_type == "place":
+                    mood_entry["places"].append(related_obj)
+                else:
+                    mood_entry["activities"].append(related_obj)

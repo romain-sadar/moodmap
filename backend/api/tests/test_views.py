@@ -5,7 +5,6 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework.exceptions import ErrorDetail
 from api.tests.factories import (
-    ActivityFactory,
     FeelingTagFactory,
     UserFactory,
     MoodFactory,
@@ -15,7 +14,8 @@ from api.tests.factories import (
     FavouritePlaceFactory,
     CategoryFactory,
     ActivityFactory,
-    ActivityCategoryFactory
+    ActivityCategoryFactory,
+    FavouriteActivityFactory,
 )
 from django.urls import reverse
 
@@ -531,10 +531,8 @@ class TestMoodEntryViewSet:
         assert MoodEntry.objects.count() == 0
 
 
-
 @pytest.mark.django_db
 class TestActivityCategoryViewSet:
-
     def test_create_activity_category(self, api_client):
         """Test creating a new activity category via API."""
         user = UserFactory()
@@ -614,7 +612,6 @@ class TestActivityCategoryViewSet:
 
 @pytest.mark.django_db
 class TestActivityViewSet:
-
     def test_create_activity(self, api_client):
         """Test creating a new activity via API."""
         user = UserFactory()
@@ -646,7 +643,7 @@ class TestActivityViewSet:
         category = ActivityCategoryFactory()
         ActivityFactory.create_batch(3, category=category)
 
-        # api_client.force_authenticate(user=user)
+        api_client.force_authenticate(user=user)
         url = reverse("activity-list")
 
         response = api_client.get(url)
@@ -704,3 +701,150 @@ class TestActivityViewSet:
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not Activity.objects.filter(pk=activity.pk).exists()
+
+
+@pytest.mark.django_db
+class TestFavouritesGroupedByMoodViewSet:
+    def test_get_grouped_favourites_success(self, api_client):
+        """Test for successfully retrieving grouped favourites by mood."""
+        user = UserFactory()
+
+        category = ActivityCategoryFactory()
+        activity = ActivityFactory(category=category)
+        mood1 = MoodFactory(label="Happy")
+        mood2 = MoodFactory(label="Excited")
+
+        activity.moods.add(mood1, mood2)
+
+        place1 = PlaceFactory()
+        place2 = PlaceFactory()
+        place1.moods.add(mood1)
+        place2.moods.add(mood1, mood2)
+
+        FavouriteActivityFactory(user=user, activity=activity)
+        FavouritePlaceFactory(user=user, place=place1)
+        FavouritePlaceFactory(user=user, place=place2)
+
+        api_client.force_authenticate(user=user)
+
+        url = reverse("favourites-grouped-by-mood")
+
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        data = response.json()
+
+        assert isinstance(data, list)
+        mood_found = any(mood.get("mood") == "Happy" for mood in data)
+        assert mood_found
+
+        happy_mood = next((mood for mood in data if mood["mood"] == "Happy"), None)
+        assert happy_mood is not None
+        assert isinstance(happy_mood.get("places", []), list)
+        assert len(happy_mood["places"]) == 2
+        assert isinstance(happy_mood.get("activities", []), list)
+        assert len(happy_mood["activities"]) == 1
+
+        excited_mood = next((mood for mood in data if mood["mood"] == "Excited"), None)
+        assert excited_mood is not None
+        assert isinstance(excited_mood.get("places", []), list)
+        assert len(excited_mood["places"]) == 1
+        assert isinstance(excited_mood.get("activities", []), list)
+        assert len(excited_mood["activities"]) == 1
+
+    def test_handle_multiple_moods_for_single_item(self, api_client):
+        """Test that an item with multiple moods appears in all relevant groups."""
+        user = UserFactory()
+
+        category = ActivityCategoryFactory()
+        activity = ActivityFactory(category=category)
+        place = PlaceFactory()
+
+        mood1 = MoodFactory(label="Happy")
+        mood2 = MoodFactory(label="Relaxed")
+
+        activity.moods.add(mood1, mood2)
+        place.moods.add(mood1, mood2)
+
+        FavouriteActivityFactory(user=user, activity=activity)
+        FavouritePlaceFactory(user=user, place=place)
+
+        api_client.force_authenticate(user=user)
+
+        url = reverse("favourites-grouped-by-mood")
+
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        data = response.json()
+        assert isinstance(data, list)
+        mood_labels = [item.get("mood") for item in data]
+        assert "Happy" in mood_labels
+        assert "Relaxed" in mood_labels
+
+        for mood_item in data:
+            if mood_item["mood"] in ["Happy", "Relaxed"]:
+                places = mood_item.get("places", [])
+                assert isinstance(places, list)
+                if mood_item["mood"] == "Happy":
+                    assert len(places) >= 1
+                if mood_item["mood"] == "Relaxed":
+                    assert len(places) >= 1
+
+                activities = mood_item.get("activities", [])
+                assert isinstance(activities, list)
+                if mood_item["mood"] == "Happy":
+                    assert len(activities) >= 1
+                if mood_item["mood"] == "Relaxed":
+                    assert len(activities) >= 1
+
+    def test_handle_no_favourites(self, api_client):
+        """Test response when there are no favourite activities or places."""
+        user = UserFactory()
+
+        api_client.force_authenticate(user=user)
+
+        url = reverse("favourites-grouped-by-mood")
+
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert isinstance(response.json(), list)
+        assert len(response.json()) == 0
+
+    def test_unauthenticated_access(self, api_client):
+        """Test that unauthenticated users cannot access the endpoint."""
+        url = reverse("favourites-grouped-by-mood")
+
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert "Authentication credentials were not provided." in str(response.data)
+
+    def test_endpoint_returns_only_favourites(self, api_client):
+        """Test that only favourite activities and places are included."""
+        user = UserFactory()
+        other_user = UserFactory()
+
+        category = ActivityCategoryFactory()
+        activity = ActivityFactory(category=category)
+        mood = MoodFactory(label="Happy")
+        activity.moods.add(mood)
+
+        place = PlaceFactory()
+        place.moods.add(mood)
+
+        FavouriteActivityFactory(user=other_user, activity=activity)
+        FavouritePlaceFactory(user=other_user, place=place)
+
+        api_client.force_authenticate(user=user)
+
+        url = reverse("favourites-grouped-by-mood")
+
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert isinstance(response.json(), list)
+        assert len(response.json()) == 0
