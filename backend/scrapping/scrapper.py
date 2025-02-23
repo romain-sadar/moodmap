@@ -21,7 +21,8 @@ if "label" not in df_places.columns or "link" not in df_places.columns:
     raise ValueError("Le fichier CSV doit contenir les colonnes 'label' et 'link'.")
 
 # 🏢 Liste des lieux avec leurs URLs
-places_urls = df_places[['label', 'link']].dropna().to_dict(orient='records')
+places_urls = df_places[["label", "link"]].dropna().to_dict(orient="records")
+
 
 # 🔍 Fonction pour scraper les avis
 def get_google_reviews(place):
@@ -30,38 +31,55 @@ def get_google_reviews(place):
 
     try:
         # ✅ Trouver et cliquer sur le bouton "Avis"
-        reviews_button = driver.find_element(By.XPATH, '//button[contains(@aria-label, "avis")]')
+        reviews_button = driver.find_element(
+            By.XPATH, '//button[contains(@aria-label, "avis")]'
+        )
         reviews_button.click()
         time.sleep(3)
 
         # ✅ Scroller pour charger plus d'avis
-        scrollable_div = driver.find_element(By.XPATH, '//div[contains(@class, "m6QErb")]')
+        scrollable_div = driver.find_element(
+            By.XPATH, '//div[contains(@class, "m6QErb")]'
+        )
         for _ in range(5):  # Ajuster le nombre de scrolls si besoin
-            driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", scrollable_div)
+            driver.execute_script(
+                "arguments[0].scrollTop = arguments[0].scrollHeight", scrollable_div
+            )
             time.sleep(2)
 
         # ✅ Extraction des avis
         reviews = []
-        review_elements = driver.find_elements(By.XPATH, '//div[contains(@class, "jftiEf fontBodyMedium")]')
+        review_elements = driver.find_elements(
+            By.XPATH, '//div[contains(@class, "jftiEf fontBodyMedium")]'
+        )
 
         for review in review_elements[:10]:  # Récupérer entre 5 et 10 avis
             try:
-                author = review.find_element(By.XPATH, './/div[contains(@class, "d4r55")]').text
-                rating = review.find_element(By.XPATH, './/span[contains(@class, "kvMYJc")]').get_attribute("aria-label")
-                review_text = review.find_element(By.XPATH, './/span[contains(@class, "wiI7pd")]').text
-                reviews.append({
-                    "place": place["label"],
-                    "author": author,
-                    "rating": rating,
-                    "review": review_text
-                })
-            except:
+                author = review.find_element(
+                    By.XPATH, './/div[contains(@class, "d4r55")]'
+                ).text
+                rating = review.find_element(
+                    By.XPATH, './/span[contains(@class, "kvMYJc")]'
+                ).get_attribute("aria-label")
+                review_text = review.find_element(
+                    By.XPATH, './/span[contains(@class, "wiI7pd")]'
+                ).text
+                reviews.append(
+                    {
+                        "place": place["label"],
+                        "author": author,
+                        "rating": rating,
+                        "review": review_text,
+                    }
+                )
+            except: #noqa E722
                 continue
 
         return reviews
     except Exception as e:
         print(f"⚠️ Erreur lors du scraping de {place['label']} : {e}")
         return None
+
 
 # 📊 Stocker les résultats
 all_reviews = []

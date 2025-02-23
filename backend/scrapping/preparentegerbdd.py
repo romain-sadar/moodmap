@@ -15,7 +15,7 @@ df_places["label"] = df_places["label"].str.lower().str.strip()
 df_moods.rename(columns={"place": "label"}, inplace=True)
 
 # Fusionner en conservant tous les lieux de singapore.csv
-df_final = df_places.merge(df_moods[['label', 'mood']], how="left", on="label")
+df_final = df_places.merge(df_moods[["label", "mood"]], how="left", on="label")
 
 # Remettre les labels dans leur format original
 df_final["label"] = df_places["label"]
