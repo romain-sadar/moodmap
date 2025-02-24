@@ -13,6 +13,13 @@ pip install pre-commit
 pre-commit install
 ```
 
+## Use Ruff
+
+```
+ruff check --fix .
+ruff format .
+```
+
 ## Docker Installation
 
 1. Create a `.envs/.local/.django` file with following content
@@ -79,7 +86,11 @@ For Windows, using [Chocolatey](https://chocolatey.org/install) `choco install m
 
 7. Run `make start`
 
+## Import data from csv
 
+```
+python manage.py import_places ./scrapping/repocsv/singapore_with_moods.csv
+```
 ## Description
 
 ## Key features
