@@ -72,7 +72,7 @@ def get_google_reviews(place):
                         "review": review_text,
                     }
                 )
-            except: #noqa E722
+            except:  # noqa E722
                 continue
 
         return reviews
