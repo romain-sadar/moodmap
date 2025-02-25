@@ -35,38 +35,42 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     ListingItem item1 = ListingItem(
-      imagePath: 'assets/images/brunchesCafe.jpg',
-      title: 'Brunch Café',
-      distance: '3km',
-      description: 'Cozy bruncher.',
-      tags: ['Calm', 'Relax'],
-      type: '☕️',
+      photo: 'assets/images/brunchesCafe.jpg',
+      label: 'Coffee Shop',
+      longitude: 0,
+      latitude: 0,
+      description: 'Perfect place for a coffee break.',
+      moods: ['Café', 'Work'],
+      category: '📚',
     );
 
     ListingItem item2 = ListingItem(
-      imagePath: 'assets/images/brunchesCafe.jpg',
-      title: 'Coffee Shop',
-      distance: '5km',
+      photo: 'assets/images/brunchesCafe.jpg',
+      label: 'Coffee Shop',
+      longitude: 0,
+      latitude: 0,
       description: 'Perfect place for a coffee break.',
-      tags: ['Café', 'Work'],
-      type: '☕️',
+      moods: ['Café', 'Work'],
+      category: '📚',
     );
   ListingItem activity1 = ListingItem(
-      imagePath: 'assets/images/brunchesCafe.jpg',
-      title: 'Lecture',
-      distance: '3min',
-      description: 'Cozy bruncher.',
-      tags: ['Calm', 'Relax'],
-      type: '☕️',
+      photo: 'assets/images/brunchesCafe.jpg',
+      label: 'Coffee Shop',
+      longitude: 0,
+      latitude: 0,
+      description: 'Perfect place for a coffee break.',
+      moods: ['Café', 'Work'],
+      category: '📚',
     );
 
     ListingItem activity2 = ListingItem(
-      imagePath: 'assets/images/brunchesCafe.jpg',
-      title: 'Coffee Shop',
-      distance: '1h',
+      photo: 'assets/images/brunchesCafe.jpg',
+      label: 'Coffee Shop',
+      longitude: 0,
+      latitude: 0,
       description: 'Perfect place for a coffee break.',
-      tags: ['Café', 'Work'],
-      type: '📚',
+      moods: ['Café', 'Work'],
+      category: '📚',
     );
     return MaterialApp(
       debugShowCheckedModeBanner: false,
