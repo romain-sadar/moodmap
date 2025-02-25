@@ -18,6 +18,7 @@ pytest = "^8.3.4"
 pytest-django = "^4.10.0"
 factory-boy = "^3.3.3"
 ipdb = "^0.13.13"
+django-cors-headers = "^4.7.0"
 
 
 [tool.poetry.group.dev.dependencies]

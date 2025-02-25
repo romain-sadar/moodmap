@@ -5,6 +5,8 @@ import 'package:moodmap/models/place_model.dart';
 import 'package:moodmap/views/home/widgets/navbar.dart';
 import 'widgets/listing_box.dart';
 import 'widgets/map_view.dart';
+import 'package:moodmap/core/services/place_service.dart';
+import 'package:moodmap/repositories/place_repository.dart';
 
 void main() {
   runApp(HomeScreen());
@@ -23,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool showListButton = false;
   double currentSheetSize = 0.4;
   int selectedIndex = 0;
+  List<ListingItem> items = [];  // List to hold your dynamic data
 
   final DraggableScrollableController _sheetController = DraggableScrollableController();
 void onTabSelected(int index) {
@@ -103,13 +106,9 @@ void onTabSelected(int index) {
                           onNotification: (notification) {
                             setState(() {
                               currentSheetSize = notification.extent;
-
-                              // Affichage du bouton si la liste est en bas
                               showListButton = currentSheetSize <= 0.1;
-                              isOnMap= currentSheetSize<=1;
-                              // Affichage des boutons de navigation si la liste est complètement ouverte
+                              isOnMap = currentSheetSize <= 1;
                               showButtons = currentSheetSize == 1.0;
-
                             });
                             return true;
                           },
@@ -213,16 +212,26 @@ void onTabSelected(int index) {
                           Positioned(
                             bottom: 20,
                             child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(backgroundColor:  AppTheme.blue, ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.blue,
+                              ),
                               onPressed: () {
                                 _sheetController.animateTo(
-                                  1.0, 
+                                  1.0,
                                   duration: Duration(milliseconds: 300),
                                   curve: Curves.easeInOut,
                                 );
                               },
-                              child: Row
-                              (children:[Icon(Icons.list, color: Colors.black,),SizedBox(width:10), Text("List",  style: TextStyle(color: Colors.black),) ]),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.list, color: Colors.black),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "List",
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                       ],
