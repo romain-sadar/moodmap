@@ -233,7 +233,7 @@ class FavouriteActivity(UUIDModel):
     added_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username}'s favourite: {self.activity.label}"
+        return f"{self.user.username}'s favourite: {self.activity.name}"
 
     class Meta:
         verbose_name = "Favourite Activity"
