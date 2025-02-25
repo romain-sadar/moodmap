@@ -185,3 +185,57 @@ class Category(UUIDModel):
     class Meta:
         verbose_name = "Category"
         verbose_name_plural = "Categories"
+
+
+class Activity(UUIDModel):
+    name = models.CharField(max_length=100, verbose_name="Activity Name")
+    description = models.TextField(null=True, blank=True, verbose_name="Description")
+    category = models.ForeignKey(
+        "ActivityCategory", on_delete=models.CASCADE, related_name="activities"
+    )
+    moods = models.ManyToManyField(
+        Mood, related_name="activities", verbose_name="Moods"
+    )
+    duration = models.IntegerField(
+        null=True, blank=True, verbose_name="Estimated Duration (minutes)"
+    )
+    image = models.ImageField(
+        upload_to="activity_images/", null=True, blank=True, verbose_name="Image"
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Activity"
+        verbose_name_plural = "Activities"
+
+
+class ActivityCategory(UUIDModel):
+    slug = models.SlugField(unique=True)
+    verbose_label = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.verbose_label
+
+    class Meta:
+        verbose_name = "Activity Category"
+        verbose_name_plural = "Activity Categories"
+
+
+class FavouriteActivity(UUIDModel):
+    user = models.ForeignKey(
+        "User", on_delete=models.CASCADE, related_name="favourite_activitiess"
+    )
+    activity = models.ForeignKey(
+        "Activity", on_delete=models.CASCADE, related_name="favourites"
+    )
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s favourite: {self.activity.label}"
+
+    class Meta:
+        verbose_name = "Favourite Activity"
+        verbose_name_plural = "Favourite Activities"
+        unique_together = ("user", "activity")

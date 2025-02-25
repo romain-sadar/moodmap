@@ -1,0 +1,71 @@
+label,latitude,longitude,description,category,mood
+toby's estate coffee roasters singapore,1.2899494,103.8348193,Riverside specialty coffee,Cafe,Calm
+the populus,1.2782503,103.838059,Trendy café & brunch spot,Cafe,Calm
+jimmy monkey cafe & bar,1.3018774,103.7876701,Cozy industrial-style café,Cafe,Calm
+twenty eight cafe,1.3021496,103.8462228,Minimalist brunch café,Cafe,Calm
+glasshouse,1.2955796,103.7863971,Glasshouse-style coffee spot,Cafe,Calm
+the local cafe,1.3457541,103.874488,Local cafe with great coffee,Cafe,Tired
+sarnies,1.2816389,103.8453891,Rustic cafe with sandwiches,Cafe,Calm
+craftsmen coffee (holland v),1.31178,103.762293,Holland Village coffee hub,Cafe,Calm
+alchemist the heeren,1.3117786,103.7002762,Hip specialty coffee roaster,Cafe,Calm
+dutch colony coffee co.,1.3142592,103.7876703,Dutch-style café & roastery,Cafe,Calm
+atlas café,1.3001138,103.8551951,High-end gin & cocktail bar,Bar,Calm
+the secret mermaid,1.2829467,103.8491274,Speakeasy-style cocktail bar,Bar,Calm
+d.bespoke,1.2787135,103.8384739,Luxury whisky & cocktail lounge,Bar,Calm
+mo bar,1.29063,103.8558597,Elegant bar with skyline views,Bar,Calm
+employees only singapore,1.2820556,103.8450968,New York-inspired cocktail bar,Bar,Stressed
+whiskey library & jazz club,1.3069404,103.8558363,Jazz & whisky experience,Bar,Calm
+smoke & mirrors,1.2904173,103.8492304,Skyline bar with panoramic views,Bar,Calm
+nutmeg & clove,1.2967133,103.8526392,Classic cocktails with spices,Bar,Calm
+the other room,1.3053584,103.8302505,Hidden lounge with unique drinks,Bar,Excited
+the elephant room singapore,1.279188,103.8414277,Indian-inspired cocktail bar,Bar,Calm
+st. joseph's church (bukit timah),1.3681915,103.7343445,Historic Catholic church,Place of Worship,Calm
+church of saints peter & paul,1.2977353,103.8489362,Gothic-style Catholic church,Place of Worship,Calm
+church of our lady of lourdes,1.3032135,103.8530177,Iconic Catholic pilgrimage site,Place of Worship,Calm
+masjid sultan singapore,1.3022854,103.8563833,Famous mosque with golden dome,Place of Worship,Calm
+sri srinivasa perumal temple,1.3132706,103.8534926,Colorful Hindu temple,Place of Worship,Calm
+wat ananda metyarama,1.278348,103.8264127,Thai Buddhist temple,Place of Worship,Calm
+sakya muni buddha gaya temple,1.3147222,103.8543641,Giant Buddha statue temple,Place of Worship,Calm
+chesed-el synagogue,1.2974527,103.8400351,Historic Jewish synagogue,Place of Worship,Calm
+central sikh gurdwara,1.2980294,103.8257178,Sikh temple & community hub,Place of Worship,Calm
+foo hai ch'an monastery,1.3179333,103.885788,Peaceful Buddhist monastery,Place of Worship,Calm
+jurong lake gardens,1.3358997,103.7235938,Lakeside park with nature trails,Park,Happy
+bukit timah nature reserve,1.3483883,103.7741207,Rainforest nature reserve,Park,Calm
+southern ridges,1.2790199,103.8069149,Hiking trails with great views,Park,Calm
+sungei buloh wetland reserve,1.4464304,103.7151643,Mangrove nature reserve,Park,Calm
+kranji marshes,1.4196408,103.7179381,Wetland with birdwatching,Park,Calm
+west coast park,1.2941659,103.7611659,Seaside park with playgrounds,Park,Calm
+pasir ris town park,1.3760966,103.9058835,Green oasis in the city,Park,Calm
+changi beach park,1.3912863,103.9879661,Coastal park with beaches,Park,Calm
+pulau ubin,1.4135642,103.9180991,Rustic island with hiking trails,Park,Calm
+lower peirce reservoir park,1.371587,103.8094105,Reservoir park with peaceful lake,Park,Calm
+the strength yard,1.308141,103.9008267,Strength training gym,Gym,Excited
+genesis gym,1.3081396,103.8208227,Personalized fitness coaching,Gym,Excited
+bft kembangan,1.313843,103.7253621,Boutique functional training gym,Gym,Calm
+elevate: the barbell club,1.3241416,103.8448073,Strength & barbell training,Gym,Calm
+bishan activesg gym,1.3553847,103.8184509,Community gym with classes,Gym,Calm
+revolution orchard,1.355383,103.7563482,Spin & HIIT studio,Gym,Happy
+barry’s - raffles place,1.2916345,103.8330665,Popular bootcamp fitness center,Gym,Excited
+yoga movement serangoon gardens,1.3624861,103.824595,Yoga studio in a green setting,Gym,Happy
+pure yoga asia square tower 1,1.2903431,103.8329742,Premium yoga & pilates studio,Gym,Excited
+gold's gym personal training - crane road,1.3125132,103.8828009,Personal training & weightlifting,Gym,Tired
+the executive centre - ocean financial centre,1.2830123,103.786097,Luxury coworking with services,Coworking,Angry
+uclub bugis junction co-working space singapore,1.2830116,103.7859253,Business hub at Bugis,Coworking,Happy
+workbuddy,1.2742752,103.8291944,Flexible workspace network,Coworking,Tired
+the working capitol,1.2788068,103.8389686,Trendy coworking for startups,Coworking,Happy
+justco – 120 robinson road coworking & office space,1.2754624,103.8352732,Premium office space provider,Coworking,Excited
+one&co,1.2754624,103.8430248,Innovation-driven coworking space,Coworking,Happy
+the hive carpenter,1.3463472,103.3091843,Chic coworking with rooftop,Coworking,Happy
+wework - office space & coworking,1.2936125,103.8263645,Global coworking brand,Coworking,Calm
+vertical space,1.3327988,103.6322822,Versatile workspaces for professionals,Coworking,Excited
+o2work,1.2967119,103.8442401,Sustainable coworking & events,Coworking,Calm
+library@chinatown,1.2852093,103.8421425,Cultural library in Chinatown,Library,Happy
+library@harbourfront,1.2636837,103.8208182,Waterfront library with views,Library,Happy
+toa payoh public library,1.3335425,103.8479265,Community library in Toa Payoh,Library,Happy
+ang mo kio public library,1.3748331,103.8429227,Neighborhood library in Ang Mo Kio,Library,Tired
+clementi public library,1.3147165,103.7614901,Westside library with study areas,Library,Calm
+serangoon public library,1.3502127,103.8703066,Suburban library with events,Library,Happy
+yishun public library,1.4294929,103.8338204,Spacious library with study spots,Library,Happy
+pasir ris public library,1.3723308,103.9472692,Library near the beach,Library,Happy
+geylang east public library,1.3174565,103.8831571,Reading hub in Geylang,Library,Happy
+sembawang public library,1.4482825,103.8169768,Library in northern Singapore,Library,Happy
