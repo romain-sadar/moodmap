@@ -13,12 +13,13 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool isOnWeek = true;
   ListingItem item1 = ListingItem(
-    imagePath: 'assets/images/brunchesCafe.jpg',
-    title: 'Brunch Café',
-    distance: '3km',
+    photo: 'assets/images/brunchesCafe.jpg',
+    label: 'Brunch Café',
+    longitude: 0,
+    latitude: 0,
     description: 'Cozy bruncher.',
-    tags: ['Calm', 'Relax'],
-    type: '☕️',
+    moods: ['Calm', 'Relax'],
+    category: '☕️',
   );
 
   @override
