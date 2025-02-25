@@ -39,6 +39,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   google_fonts: ^4.0.4
   duration_picker: ^1.2.0
+  flutter_map: ^4.0.0
 
 dev_dependencies:
   flutter_test:

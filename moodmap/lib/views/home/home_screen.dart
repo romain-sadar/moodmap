@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moodmap/core/themes.dart';
+import 'package:moodmap/models/activity_model.dart';
 import 'package:moodmap/models/place_model.dart';
 import 'package:moodmap/views/home/widgets/navbar.dart';
 import 'widgets/listing_box.dart';
@@ -23,55 +24,67 @@ class _HomeScreenState extends State<HomeScreen> {
   double currentSheetSize = 0.4;
   int selectedIndex = 0;
 
-  final DraggableScrollableController _sheetController =
-      DraggableScrollableController(); // Ajout du contrôleur
-
-  void onTabSelected(int index) {
+  final DraggableScrollableController _sheetController = DraggableScrollableController();
+void onTabSelected(int index) {
     setState(() {
       selectedIndex = index;
     });
   }
 
+  List<ListingItem> listingItems = [
+    ListingItem(
+      photo: 'assets/images/brunchesCafe.jpg',
+      label: 'Coffee Shop',
+      longitude: 0,
+      latitude: 0,
+      description: 'Perfect place for a coffee break.',
+      moods: ['Café', 'Work'],
+      category: '📚',
+    ),
+    ListingItem(
+      photo: 'assets/images/brunchesCafe.jpg',
+      label: 'Another Coffee Shop',
+      longitude: 0,
+      latitude: 0,
+      description: 'A great spot for meetings.',
+      moods: ['Café', 'Relax'],
+      category: '☕',
+    ),
+  ];
+  List<Activity> listingActivities = [
+  Activity(
+    photo: 'assets/images/activity1.jpg',
+    label: 'Yoga Class',
+    time:60,
+    description: 'Relax and stretch your body.',
+    moods: ['Relax', 'Sport'],
+    category: 'yoga',
+  ),
+  Activity(
+    photo: 'assets/images/activity2.jpg',
+    label: 'Live Music Night',
+    time:5,
+    description: 'Enjoy live music with friends.',
+    moods: ['Music', 'Social'],
+    category: 'book',
+  ),
+];
+
+  void onPlaceSelected(ListingItem selectedItem) {
+    setState(() {
+      listingItems.removeWhere((item) => item.label == selectedItem.label);
+      listingItems.insert(0, selectedItem); 
+    });
+    print(selectedItem.label);
+    _sheetController.animateTo(
+      0.21, 
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    ListingItem item1 = ListingItem(
-      photo: 'assets/images/brunchesCafe.jpg',
-      label: 'Coffee Shop',
-      longitude: 0,
-      latitude: 0,
-      description: 'Perfect place for a coffee break.',
-      moods: ['Café', 'Work'],
-      category: '📚',
-    );
-
-    ListingItem item2 = ListingItem(
-      photo: 'assets/images/brunchesCafe.jpg',
-      label: 'Coffee Shop',
-      longitude: 0,
-      latitude: 0,
-      description: 'Perfect place for a coffee break.',
-      moods: ['Café', 'Work'],
-      category: '📚',
-    );
-  ListingItem activity1 = ListingItem(
-      photo: 'assets/images/brunchesCafe.jpg',
-      label: 'Coffee Shop',
-      longitude: 0,
-      latitude: 0,
-      description: 'Perfect place for a coffee break.',
-      moods: ['Café', 'Work'],
-      category: '📚',
-    );
-
-    ListingItem activity2 = ListingItem(
-      photo: 'assets/images/brunchesCafe.jpg',
-      label: 'Coffee Shop',
-      longitude: 0,
-      latitude: 0,
-      description: 'Perfect place for a coffee break.',
-      moods: ['Café', 'Work'],
-      category: '📚',
-    );
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SafeArea(
@@ -79,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Scaffold(
           body: Stack(
             children: [
-              MapScreen(),
+              MapScreen(onPlaceSelected: onPlaceSelected), 
               Column(
                 children: [
                   Expanded(
@@ -102,30 +115,30 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           child: DraggableScrollableSheet(
                             controller: _sheetController, // Assignation du contrôleur
-                            initialChildSize: 0.4,
-                            minChildSize: 0,
-                            maxChildSize: 1.0,
+                          initialChildSize: 0.4,
+                          minChildSize: 0,
+                          maxChildSize: 1.0,
                             builder: (BuildContext context, scrollController) {
-                              return Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    topRight: Radius.circular(20),
-                                  ),
+                            return Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20),
                                 ),
-                                child: Column(
-                                  children: [
-                                    if (showButtons)
+                              ),
+                              child: Column(
+                                children: [
+                                  if (showButtons)
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10.0),
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
-                                          children: [
-                                            ElevatedButton(
+                                      children: [
+                                        ElevatedButton(
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: isOnMap
                                                     ? AppTheme.blue
@@ -148,8 +161,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                               },
                                               child: Icon(Icons.map,
                                                   color: Colors.white),
-                                            ),
-                                            ElevatedButton(
+                                        ),
+                                        ElevatedButton(
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: !isOnMap
                                                     ? AppTheme.violet
@@ -172,31 +185,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                               },
                                               child: Icon(Icons.location_off,
                                                   color: Colors.white),
-                                            ),
-                                          ],
                                         ),
-                                      ),
-                                    Expanded(
-                                      child: ListView(
-                                        controller: scrollController,
-                                        children: [
-                                          if (isOnMap) ...[
-                                            ListingBox(item: item1),
-                                            SizedBox(height: 8),
-                                            ListingBox(item: item2),
-                                          ] else ...[
-                                            ListingBox(item: activity1),
-                                            SizedBox(height: 8),
-                                            ListingBox(item: activity2),
-                                          ],
-                                        ],
-                                      ),
+                                      ],
+                                        ),
                                     ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      controller: scrollController,
+                                      itemCount: isOnMap ? listingItems.length : listingActivities.length,
+                                      itemBuilder: (context, index) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(vertical:4.0),
+                                          child: ListingBox(
+                                            item: isOnMap ? listingItems[index] : listingActivities[index],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                         ),
                         if (showListButton)
                           Positioned(

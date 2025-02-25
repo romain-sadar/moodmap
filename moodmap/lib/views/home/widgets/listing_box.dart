@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moodmap/core/themes.dart';
+import 'package:moodmap/core/utils.dart';
 import 'package:moodmap/models/activity_model.dart';
 
 class ListingBox extends StatelessWidget {
@@ -61,7 +62,7 @@ class ListingBox extends StatelessWidget {
                                   item.label,
                                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                                 ),
-                                // Affiche "time" si c'est une activité, "longitude" si c'est un lieu
+                                
                                 Text(
                                   item is Activity ? item.time.toString() : item.longitude.toString(),
                                   style: TextStyle(color: Colors.grey, fontSize: 12, fontStyle: FontStyle.italic),
@@ -95,13 +96,12 @@ class ListingBox extends StatelessWidget {
                       ],
                     ),
                   ),
-
-                  
                   Positioned(
                     top: 8,  
                     right: 10, 
                     child: Text(
-                      '☕️',
+                      item is Activity? getEmojiActivities(item.category):
+                      getEmojiPlaces(item.category),
                       style: TextStyle(fontSize: 20), 
                     ),
                   ),
@@ -124,7 +124,7 @@ class ListingBox extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.directions_walk,
+                     item is Activity? Icons.play_arrow :Icons.directions_walk,
                       size: 20, 
                       color: Colors.black, 
                     ),
