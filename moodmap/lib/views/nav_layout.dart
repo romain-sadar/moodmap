@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:moodmap/core/themes.dart';
 import 'package:moodmap/views/home/home_screen.dart';
 import 'package:moodmap/views/home/widgets/mood_form.dart';
-import 'package:moodmap/views/home/widgets/mood_form_location.dart';
 import 'package:moodmap/views/home/widgets/navbar.dart';
+import 'package:moodmap/views/profile/profile_screen.dart';
 
 class NavLayout extends StatefulWidget {
   @override
@@ -29,7 +29,7 @@ class _NavLayoutState extends State<NavLayout> {
       HomeScreen(),
       MoodFormScreen(goToHome: _goToHome),
       // FavoriteScreen(),
-      // ProfileScreen(),
+      ProfileScreen(),
     ]);
   }
 
