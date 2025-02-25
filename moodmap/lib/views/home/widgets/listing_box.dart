@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:moodmap/core/themes.dart';
-import 'package:moodmap/models/place_model.dart';
+import 'package:moodmap/models/activity_model.dart';
 
 class ListingBox extends StatelessWidget {
-  final ListingItem item;
-
+  final dynamic item;  
+  
   ListingBox({required this.item});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(1.0),
-      child: IntrinsicHeight( // Uniformise la hauteur des enfants
+      child: IntrinsicHeight( 
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch, // Étire les enfants pour qu'ils aient la même hauteur
+          crossAxisAlignment: CrossAxisAlignment.stretch, 
           children: [
-            // Utilisation de Stack pour superposer le smiley sur le container
+            
             Expanded(
               child: Stack(
                 children: [
-                  // Container principal (Image + Texte)
                   Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
@@ -35,15 +34,22 @@ class ListingBox extends StatelessWidget {
                         // Image à gauche avec coins arrondis
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.asset(
-                           item.imagePath,
+                          child: Image.network(
+                            item.photo,
                             width: 100,
                             height: 100,
                             fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 100,
+                                height: 100,
+                                color: Colors.grey[300],
+                                child: Icon(Icons.broken_image, color: Colors.grey[600]),
+                              );
+                            },
                           ),
                         ),
-
-                        // Texte à droite de l’image
+                      
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -52,22 +58,23 @@ class ListingBox extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
-                                  item.title,
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18,  ),
+                                  item.label,
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                                 ),
+                                // Affiche "time" si c'est une activité, "longitude" si c'est un lieu
                                 Text(
-                                  item.distance,
-                                  style: TextStyle(color: Colors.grey, fontSize: 12, fontStyle:FontStyle.italic ),
+                                  item is Activity ? item.time.toString() : item.longitude.toString(),
+                                  style: TextStyle(color: Colors.grey, fontSize: 12, fontStyle: FontStyle.italic),
                                 ),
                                 Text(
                                   item.description,
-                                  style: TextStyle( fontSize: 12),
+                                  style: TextStyle(fontSize: 12),
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(height:10),
+                                SizedBox(height: 10),
                                 Wrap(
                                   spacing: 5,
-                                  children: item.tags.map((tag) {
+                                  children: (item.moods as List<String>).map((tag) {
                                     return Container(
                                       padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
                                       decoration: BoxDecoration(
@@ -76,12 +83,11 @@ class ListingBox extends StatelessWidget {
                                       ),
                                       child: Text(
                                         tag,
-                                        style: TextStyle(color: AppTheme.blue, fontWeight: FontWeight.bold, fontSize:12),
+                                        style: TextStyle(color: AppTheme.blue, fontWeight: FontWeight.bold, fontSize: 12),
                                       ),
                                     );
                                   }).toList(),
                                 ),
-                                
                               ],
                             ),
                           ),
@@ -90,13 +96,13 @@ class ListingBox extends StatelessWidget {
                     ),
                   ),
 
-                  // Smiley positionné en haut à droite
+                  
                   Positioned(
-                    top: 8,  // Ajuste la position verticale
-                    right: 10, // Ajuste la position horizontale
+                    top: 8,  
+                    right: 10, 
                     child: Text(
                       '☕️',
-                      style: TextStyle(fontSize: 20), // Taille du smiley
+                      style: TextStyle(fontSize: 20), 
                     ),
                   ),
                 ],
@@ -114,7 +120,6 @@ class ListingBox extends StatelessWidget {
                 ),
               ),
               child: Center(
-                
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

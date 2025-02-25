@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:moodmap/core/themes.dart';
+import 'package:moodmap/views/favorites/favorites_screen.dart';
 import 'package:moodmap/views/home/home_screen.dart';
 import 'package:moodmap/views/home/widgets/mood_form.dart';
-import 'package:moodmap/views/home/widgets/mood_form_location.dart';
 import 'package:moodmap/views/home/widgets/navbar.dart';
 
 class NavLayout extends StatefulWidget {
@@ -28,7 +28,7 @@ class _NavLayoutState extends State<NavLayout> {
     _screens.addAll([
       HomeScreen(),
       MoodFormScreen(goToHome: _goToHome),
-      // FavoriteScreen(),
+      FavoriteScreen(),
       // ProfileScreen(),
     ]);
   }
@@ -80,7 +80,7 @@ void _showMoodDialog() {
             onPressed: () {
               Navigator.pop(context); 
               setState(() {
-                _selectedIndex = 2; 
+                _selectedIndex = 3; 
               });
             },
             child: Text("Review a place"),
