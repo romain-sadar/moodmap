@@ -127,6 +127,15 @@ class PlaceViewSet(viewsets.ModelViewSet):
     serializer_class = PlaceSerializer
     queryset = Place.objects.all()
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        moods = self.request.query_params.getlist("moods[]")
+
+        if moods:
+            queryset = queryset.filter(moods__label__in=moods).distinct()
+
+        return queryset
+
     @action(detail=True, methods=["get"], url_path="moods")
     def get_moods(self, request, pk=None):
         """
