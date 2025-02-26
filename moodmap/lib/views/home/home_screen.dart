@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Scaffold(
           body: Stack(
             children: [
-              MapScreen(onPlaceSelected: onPlaceSelected),
+              MapScreen(onPlaceSelected: onPlaceSelected, places: items),
               Column(
                 children: [
                   Expanded(
