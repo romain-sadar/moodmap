@@ -8,6 +8,15 @@ class ListingBox extends StatelessWidget {
   
   ListingBox({required this.item});
 
+  Widget _buildPlaceholder() {
+    return Container(
+      width: 100,
+      height: 100,
+      color: Colors.grey[300],
+      child: Icon(Icons.image, color: Colors.grey[600]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -35,22 +44,18 @@ class ListingBox extends StatelessWidget {
                         // Image à gauche avec coins arrondis
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            item.photo,
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                width: 100,
-                                height: 100,
-                                color: Colors.grey[300],
-                                child: Icon(Icons.broken_image, color: Colors.grey[600]),
-                              );
-                            },
-                          ),
+                          child: item.photo != null && item.photo!.isNotEmpty
+                              ? Image.network(
+                                  item.photo!,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return _buildPlaceholder(); // Use a reusable placeholder method
+                                  },
+                                )
+                              : _buildPlaceholder(),
                         ),
-                      
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -68,7 +73,7 @@ class ListingBox extends StatelessWidget {
                                   style: TextStyle(color: Colors.grey, fontSize: 12, fontStyle: FontStyle.italic),
                                 ),
                                 Text(
-                                  item.description,
+                                  item.description ?? "No description available",
                                   style: TextStyle(fontSize: 12),
                                   overflow: TextOverflow.ellipsis,
                                 ),
