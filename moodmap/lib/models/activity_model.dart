@@ -3,7 +3,7 @@ class Activity {
   final double time;
   final String description;
   final String category;
-  final String photo;
+  String? photo;
   final List<String> moods;
 
   Activity({
@@ -11,7 +11,7 @@ class Activity {
     required this.time,
     required this.description,
     required this.category,
-    required this.photo,
+    this.photo,
     required this.moods,
   });
   factory Activity.fromJson(Map<String, dynamic> json) {

@@ -1,3 +1,3 @@
 class AppConstants {
-  static const String apiBaseUrl = "http://localhost:8000"; // API Dockerisée
+  static const String apiBaseUrl = "http://127.0.0.1:8000/backend";
 }
