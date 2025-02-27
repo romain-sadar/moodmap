@@ -5,6 +5,8 @@ import 'package:moodmap/views/home/home_screen.dart';
 import 'package:moodmap/views/home/widgets/mood_form.dart';
 import 'package:moodmap/views/home/widgets/navbar.dart';
 import 'package:moodmap/views/profile/profile_screen.dart';
+import 'auth/login_screen.dart';
+
 
 class NavLayout extends StatefulWidget {
   @override

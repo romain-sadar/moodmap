@@ -31,7 +31,11 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.0.0
+  google_sign_in: ^5.0.7
   http: ^0.13.6
+  logger: ^1.1.0
+  flutter_secure_storage: ^9.0.0
+
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -40,6 +44,7 @@ dependencies:
   google_fonts: ^4.0.4
   duration_picker: ^1.2.0
   flutter_map: ^4.0.0
+  shared_preferences: ^2.5.2
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +64,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/
+    - assets/images/glogo.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
