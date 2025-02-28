@@ -2,7 +2,8 @@ openapi: 3.0.3
 info:
   title: User Authentication and Mood API
   version: 1.0.0
-  description: API endpoints for user authentication and mood management, including registration, login, and mood operations.
+  description: API endpoints for user authentication, mood management, and favorite places or activities.
+
 paths:
   /auth/register/:
     post:
@@ -29,6 +30,7 @@ paths:
                     format: uuid
         "400":
           description: Invalid input
+
   /auth/login/:
     post:
       summary: Login user
@@ -60,6 +62,27 @@ paths:
                         type: string
         "400":
           description: Invalid credentials or inactive user
+
+  /profile/:
+    patch:
+      summary: Update the user profile
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        "200":
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        "400":
+          description: Invalid input
+
   /mood/:
     get:
       summary: List all moods
@@ -94,29 +117,37 @@ paths:
                 $ref: '#/components/schemas/MoodResponse'
         "400":
           description: Invalid input
-  /mood/{id}/:
+
+  /place/:
     get:
-      summary: Retrieve a specific mood
-      operationId: retrieveMood
+      summary: List all places with optional mood filtering
+      operationId: listPlaces
       parameters:
-        - name: id
-          in: path
-          required: true
+        - name: moods[]
+          in: query
+          required: false
           schema:
-            type: string
-            format: uuid
+            type: array
+            items:
+              type: string
+          description: Filter places by mood labels (e.g., moods[]=Calm)
       responses:
         "200":
-          description: A specific mood
+          description: A list of places
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MoodResponse'
-        "404":
-          description: Mood not found
-    put:
-      summary: Update a specific mood
-      operationId: updateMood
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PlaceResponse'
+
+  /place/{id}/:
+    get:
+      summary: Retrieve a specific place
+      operationId: retrievePlace
       parameters:
         - name: id
           in: path
@@ -124,38 +155,61 @@ paths:
           schema:
             type: string
             format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MoodRequest'
+        - name: moods[]
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          description: Filter places by mood labels (e.g., moods[]=Calm)
       responses:
         "200":
-          description: Mood updated successfully
+          description: A specific place
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MoodResponse'
-        "400":
-          description: Invalid input
+                $ref: '#/components/schemas/PlaceResponse'
         "404":
-          description: Mood not found
-    delete:
-      summary: Delete a specific mood
-      operationId: deleteMood
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+          description: Place not found
+
+
+  /favourites/:
+    get:
+      summary: List all favourite places of the user
+      operationId: listFavouritePlaces
       responses:
-        "204":
-          description: Mood deleted successfully
-        "404":
-          description: Mood not found
+        "200":
+          description: A list of favorite places grouped by categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PlaceResponse'
+
+  /favourites/grouped-by-mood/:
+    get:
+      summary: Get favourite places and activities grouped by mood
+      operationId: listFavouritesGroupedByMood
+      responses:
+        "200":
+          description: List of favourite places and activities grouped by mood
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FavouriteGroupedByMoodResponse'
+
 components:
   schemas:
     UserRegistration:
@@ -174,6 +228,7 @@ components:
           type: string
           enum: [M, F, O, N]
           nullable: true
+
     UserLogin:
       type: object
       properties:
@@ -183,6 +238,7 @@ components:
         password:
           type: string
           format: password
+
     UserResponse:
       type: object
       properties:
@@ -194,20 +250,7 @@ components:
           format: email
         username:
           type: string
-    LoginResponse:
-      type: object
-      properties:
-        message:
-          type: string
-        user:
-          $ref: '#/components/schemas/UserResponse'
-        tokens:
-          type: object
-          properties:
-            refresh:
-              type: string
-            access:
-              type: string
+
     MoodRequest:
       type: object
       properties:
@@ -215,6 +258,7 @@ components:
           type: string
           maxLength: 50
           nullable: true
+
     MoodResponse:
       type: object
       properties:
@@ -224,3 +268,84 @@ components:
         label:
           type: string
           nullable: true
+
+    PlaceRequest:
+      type: object
+      properties:
+        label:
+          type: string
+          maxLength: 255
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        description:
+          type: string
+        category:
+          type: string
+          format: uuid
+        photo:
+          type: string
+          format: uri
+
+    PlaceResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        label:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        description:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategoryResponse'
+        photo:
+          type: string
+          format: uri
+
+    FavouriteGroupedByMoodResponse:
+      type: object
+      properties:
+        mood:
+          type: string
+        places:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlaceResponse'
+        activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityResponse'
+
+    ActivityResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          $ref: '#/components/schemas/ActivityCategoryResponse'
+
+    ActivityCategoryResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        verbose_label:
+          type: string
