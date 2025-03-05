@@ -120,6 +120,13 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "created_at", "updated_at")
 
 
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "age", "gender", "premium"]
+        read_only_fields = ["email", "premium"]
+
+
 class MoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mood
@@ -166,6 +173,7 @@ class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place
         fields = (
+            "id",
             "label",
             "latitude",
             "longitude",

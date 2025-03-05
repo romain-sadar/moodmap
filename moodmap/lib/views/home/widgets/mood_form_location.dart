@@ -1,43 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:moodmap/core/services/visited_place_service.dart';  // Import your service file
 import 'package:duration_picker/duration_picker.dart';
 import 'package:moodmap/core/themes.dart';
 
+
 enum Mood {
-  verySad("😢", "Very Sad"),
-  sad("😞", "Sad"),
-  neutral("😐", "Neutral"),
+  angry("😡", "Angry"),
+  calm("😌", "Calm"),
+  excited("🤩", "Excited"),
   happy("🙂", "Happy"),
-  veryHappy("😄", "Very Happy");
+  stressed("😖", "Stressed"),
+  tired("🥱", "Tired");
 
   final String emoji;
   final String label;
 
   const Mood(this.emoji, this.label);
-   List<String> get tags {
+
+  List<String> get tags {
     switch (this) {
-      case Mood.verySad:
-        return ["Stressed", "Depressed", "Hopeless", "Exhausted"];
-      case Mood.sad:
-        return ["Anxious", "Worried", "Disappointed", "Frustrated"];
-      case Mood.neutral:
-        return ["Indifferent", "Bored", "Relaxed", "Chill"];
+      case Mood.angry:
+        return ["Frustrated", "Irritated", "Annoyed", "Furious"];
+      case Mood.calm:
+        return ["Relaxed", "Peaceful", "Content", "Serene"];
+      case Mood.excited:
+        return ["Energetic", "Eager", "Enthusiastic", "Elated"];
       case Mood.happy:
-        return ["Excited", "Romantic", "Awesome", "Fantastic"];
-      case Mood.veryHappy:
-        return ["Euphoric", "Overjoyed", "Ecstatic", "Unstoppable"];
+        return ["Joyful", "Optimistic", "Cheerful", "Grateful"];
+      case Mood.stressed:
+        return ["Overwhelmed", "Anxious", "Tense", "Burned out"];
+      case Mood.tired:
+        return ["Exhausted", "Sleepy", "Drained", "Fatigued"];
     }
   }
 }
+
 class MoodFormLocationScreen extends StatefulWidget {
+  final String visitedPlaceId;
+
+  MoodFormLocationScreen({Key? key, required this.visitedPlaceId}) : super(key: key);
+
   @override
   _MoodFormLocationScreenState createState() => _MoodFormLocationScreenState();
 }
 
+
 class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
-  Mood _moodValue = Mood.happy; 
+  Mood _moodValue = Mood.happy;
   List<String> selectedTags = [];
   Duration _selectedDuration = Duration(hours: 0, minutes: 0);
-  bool favorites=false;
+  bool favorites = false;
+
   void toggleTag(String tag) {
     setState(() {
       if (selectedTags.contains(tag)) {
@@ -47,9 +60,8 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
       }
     });
   }
-  
 
-   Future<void> _pickDuration() async {
+     Future<void> _pickDuration() async {
     Duration? picked = await showDurationPicker(
       context: context,
       initialTime: _selectedDuration,
@@ -67,6 +79,7 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
       });
     }
   }
+
 
   void _showFavoriteDialog(BuildContext context) {
   showDialog(
@@ -112,6 +125,22 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
   );
 }
 
+  // Initialize the visited place service
+  final visitedPlaceService = VisitedPlaceService();
+
+  Future<void> _updateVisitedPlace() async {
+    final String placeId = 'visitedPlaceId123';  // Replace with the actual place ID
+    final String moodName = _moodValue.label;  // Use the label of the selected mood
+
+    try {
+      await visitedPlaceService.updateVisitedPlaceFeedback(placeId, moodName);
+      print('Visited place feedback updated successfully!');
+      // Optionally, show a success message to the user
+    } catch (error) {
+      print('Failed to update visited place: $error');
+      // Handle error (e.g., show an error message to the user)
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +149,7 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              
+              // Skip action, navigate away
             },
             child: Text("Skip", style: TextStyle(color: Colors.white, fontSize: 16)),
           )
@@ -130,28 +159,26 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
       ),
       body: Stack(
         children: [
-          
           Container(
             padding: EdgeInsets.symmetric(vertical: 5),
             color: AppTheme.blue,
             child: Column(
               children: [
-                Text("How did you feel at this place ?", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                Text("How did you feel at this place?", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
                 Text(_moodValue.emoji, style: TextStyle(fontSize: 90)),
-               
                 Text(_moodValue.label, style: TextStyle(color: Colors.white, fontSize: 18)),
                 SizedBox(height: 10),
                 SliderTheme(
                   data: SliderThemeData(
-                    trackHeight: 20.0, 
-                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 13.0), 
-                    activeTrackColor: Colors.white, 
-                    inactiveTrackColor: Colors.white54, 
-                    thumbColor: Colors.white, 
+                    trackHeight: 20.0,
+                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 13.0),
+                    activeTrackColor: Colors.white,
+                    inactiveTrackColor: Colors.white54,
+                    thumbColor: Colors.white,
                   ),
                   child: Slider(
-                    value:  Mood.values.indexOf(_moodValue).toDouble(),
+                    value: Mood.values.indexOf(_moodValue).toDouble(),
                     min: 0,
                     max: Mood.values.length - 1,
                     divisions: Mood.values.length - 1,
@@ -166,9 +193,8 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
               ],
             ),
           ),
-             
           Positioned(
-            top: 255, 
+            top: 255,
             left: 0,
             right: 0,
             bottom: 0,
@@ -184,7 +210,7 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Describe how you felt at this place.", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height:5),
+                    SizedBox(height: 5),
                     Wrap(
                       spacing: 10,
                       children: _moodValue.tags.map((tag) {
@@ -204,12 +230,10 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
                         );
                       }).toList(),
                     ),
-                            
                     SizedBox(height: 10),
-                            
-                   Text("How long did you stay here?", style: TextStyle( fontSize: 18,fontWeight: FontWeight.bold)),
-                  SizedBox(height: 5),
-                  Center(
+                    Text("How long did you stay here?", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 5),
+                    Center(
                       child: ElevatedButton(
                         onPressed: _pickDuration,
                         style: ElevatedButton.styleFrom(
@@ -221,9 +245,8 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
                           style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                       ),
-                    ), Spacer(),
-                            
-                    
+                    ),
+                    Spacer(),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -233,7 +256,8 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
                           print("Selected Tags: $selectedTags");
                           print("Time: $_selectedDuration");
                           print("Favorite: $favorites");
-                    
+
+                          _updateVisitedPlace();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.blue,
@@ -247,8 +271,6 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
               ),
             ),
           ),
-        
-          
           Positioned(
             top: 255,
             left: 0,
@@ -261,12 +283,11 @@ class _MoodFormLocationScreenState extends State<MoodFormLocationScreen> {
               ),
             ),
           ),
-       ],
+        ],
       ),
     );
   }
 }
-
 
 class OvalClipper extends CustomClipper<Path> {
   @override

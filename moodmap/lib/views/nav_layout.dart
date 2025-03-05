@@ -13,91 +13,85 @@ class NavLayout extends StatefulWidget {
 
 class _NavLayoutState extends State<NavLayout> {
   int _selectedIndex = 0;
+  String? selectedMood;
 
-  // Method to navigate to the home screen
-  void _goToHome() {
+  void _goToHome(String moodLabel) {
     setState(() {
-      _selectedIndex = 0; 
+      _selectedIndex = 0;
+      selectedMood = moodLabel;
     });
   }
 
-  final List<Widget> _screens = [];
+  void _onItemTapped(int index) {
+    if (index == 1) {
+      _showMoodDialog();
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+  }
+
+  void _showMoodDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text("What do you want to do?"),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: AppTheme.blue,
+                    foregroundColor: Colors.white,
+                    shape: StadiumBorder(side: BorderSide(color: AppTheme.blue)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      _selectedIndex = 1;
+                    });
+                  },
+                  child: Text("Fill a new form"),
+                ),
+                SizedBox(width: 5),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: AppTheme.blue,
+                    foregroundColor: Colors.white,
+                    shape: StadiumBorder(side: BorderSide(color: AppTheme.blue)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      _selectedIndex = 3;
+                    });
+                  },
+                  child: Text("Review a place"),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
-  void initState() {
-    super.initState();
-    _screens.addAll([
-      HomeScreen(),
+  Widget build(BuildContext context) {
+    // Dynamically build screens so HomeScreen gets updated `selectedMood`
+    final List<Widget> screens = [
+      HomeScreen(selectedMood: selectedMood),
       MoodFormScreen(goToHome: _goToHome),
       FavoriteScreen(),
       ProfileScreen(),
+    ];
 
-    ]);
-  }
-
- 
-  void _onItemTapped(int index) {
-  if (index == 1) { 
-    _showMoodDialog();
-  } else {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-}
-
-void _showMoodDialog() {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor:Colors.white,
-        title: Text("What do you want to do?"),
-       
-        actions: [
-          Row(
-            mainAxisAlignment:MainAxisAlignment.center,
-            children: [TextButton(
-            style: 
-              TextButton.styleFrom(
-                backgroundColor: AppTheme.blue,
-                foregroundColor:  Colors.white,
-                shape: StadiumBorder(side: BorderSide(color: AppTheme.blue)),
-              ),
-            onPressed: () {
-              Navigator.pop(context); 
-              setState(() {
-                _selectedIndex = 1; 
-              });
-            },
-            child: Text("Fill a new form"),
-          ),
-          SizedBox(width: 5,),
-          TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: AppTheme.blue,
-              foregroundColor: Colors.white,
-              shape: StadiumBorder(side: BorderSide(color: AppTheme.blue)),
-            ),
-            onPressed: () {
-              Navigator.pop(context); 
-              setState(() {
-                _selectedIndex = 3; 
-              });
-            },
-            child: Text("Review a place"),
-          ),
-        ],
-          )
-          ],
-      );
-    },
-  );
-}
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndex], 
+      body: screens[_selectedIndex],
       bottomNavigationBar: NavBar(
         selectedIndex: _selectedIndex,
         onTabSelected: _onItemTapped,

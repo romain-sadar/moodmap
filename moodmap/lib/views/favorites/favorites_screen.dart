@@ -24,50 +24,53 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     _loadFavoriteData();
   }
 
-  void _loadFavoriteData() {
-    String jsonData = '''
-    [
-      {
-        "mood": "Happy",
-        "places": [
-          {
-            "label": "Will",
-            "latitude": -58.7093475,
-            "longitude": 132.387897,
-            "description": "Cozy bruncher.",
-            "category": "exist-specific",
-            "photo": "https://picsum.photos/462/600",
-            "moods": ["Happy", "Relax"]
-          },
-          {
-            "label": "Couple Spot",
-            "latitude": 3.1999785,
-            "longitude": -132.495354,
-            "description": "Romantic atmosphere.",
-            "category": "see-radio-rule",
-            "photo": "https://picsum.photos/462/645",
-            "moods": ["Happy", "Excited"]
-          }
-        ],
-        "activities": []
-      },
-      {
-        "mood": "Focus",
-        "places": [
-          {
-            "label": "Quiet Café",
-            "latitude": -12.4567,
-            "longitude": 45.6789,
-            "description": "Perfect for working.",
-            "category": "work-friendly",
-            "photo": "https://picsum.photos/300/200",
-            "moods": ["Focus"]
-          }
-        ],
-        "activities": []
-      }
-    ]
-    ''';
+void _loadFavoriteData() {
+  String jsonData = '''
+  [
+    {
+      "mood": "Happy",
+      "places": [
+        {
+          "id": "1",
+          "label": "Will",
+          "latitude": -58.7093475,
+          "longitude": 132.387897,
+          "description": "Cozy bruncher.",
+          "category": "exist-specific",
+          "photo": "https://picsum.photos/462/600",
+          "moods": ["Happy", "Relax"]
+        },
+        {
+          "id": "2",
+          "label": "Couple Spot",
+          "latitude": 3.1999785,
+          "longitude": -132.495354,
+          "description": "Romantic atmosphere.",
+          "category": "see-radio-rule",
+          "photo": "https://picsum.photos/462/645",
+          "moods": ["Happy", "Excited"]
+        }
+      ],
+      "activities": []
+    },
+    {
+      "mood": "Focus",
+      "places": [
+        {
+          "id": "3",
+          "label": "Quiet Café",
+          "latitude": -12.4567,
+          "longitude": 45.6789,
+          "description": "Perfect for working.",
+          "category": "work-friendly",
+          "photo": "https://picsum.photos/300/200",
+          "moods": ["Focus"]
+        }
+      ],
+      "activities": []
+    }
+  ]
+  ''';
 
     List<dynamic> data = jsonDecode(jsonData);
     setState(() {

@@ -1,14 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:moodmap/core/services/auth_service.dart';
 import 'package:moodmap/core/themes.dart';
 
-class UpgradeScreen extends StatelessWidget {
+class UpgradeScreen extends StatefulWidget {
+  @override
+  _UpgradeScreenState createState() => _UpgradeScreenState();
+}
+
+class _UpgradeScreenState extends State<UpgradeScreen> {
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
+
+  /// ✅ Upgrade the user plan
+  Future<void> _upgradePlan() async {
+  setState(() {
+    _isLoading = true;
+  });
+
+  bool success = await _authService.upgradeToPremium();
+
+  setState(() {
+    _isLoading = false;
+  });
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(success ? "🎉 You are now a Premium user!" : "❌ Failed to upgrade. Try again!"),
+      backgroundColor: success ? Colors.green : Colors.red,
+    ),
+  );
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
-      appBar: AppBar(
-        title: Text("Upgrade Your Plan"),
-      ),
+      appBar: AppBar(title: Text("Upgrade Your Plan")),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(10.0),
@@ -18,7 +45,6 @@ class UpgradeScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(vertical: 20),
@@ -35,48 +61,33 @@ class UpgradeScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-          
-                
-                Positioned(
-                  child: ClipPath(
-                    clipper: OvalClipper(),
-                    child: Container(
-                      height: 55,
-                      color: AppTheme.blue,
-                    ),
-                  ),
-                ),
-          
-               
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      Text(" Unlock the full experience with Premium:\n",style: TextStyle(fontSize: 18, fontWeight:FontWeight.bold )),
+                      Text("Unlock the full experience with Premium:\n",
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       Text(
                         "✨ Unlimited access to exclusive content\n"
                         "📊 Advanced analytics & insights\n"
                         "⭐ Like & review places you've explored\n"
                         "⚡ Priority support for a seamless experience",
-                       
                         style: TextStyle(fontSize: 16),
                       ),
                       SizedBox(height: 20),
-          
-                      
                       ElevatedButton(
-                        onPressed: () {
-                          
-                        },
+                        onPressed: _isLoading ? null : _upgradePlan,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.blue,
-
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                         ),
-                        child: Text("Upgrade", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
+                        child: _isLoading
+                            ? CircularProgressIndicator(color: Colors.black)
+                            : Text(
+                                "Upgrade",
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+                              ),
                       ),
                     ],
                   ),
@@ -87,25 +98,5 @@ class UpgradeScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-
-class OvalClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.moveTo(0, size.height);
-    path.quadraticBezierTo(
-      size.width / 2, -size.height / 2, size.width, size.height);
-    path.lineTo(size.width, 0);
-    path.lineTo(0, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
   }
 }

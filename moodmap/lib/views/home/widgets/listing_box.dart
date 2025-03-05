@@ -2,11 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:moodmap/core/themes.dart';
 import 'package:moodmap/core/utils.dart';
 import 'package:moodmap/models/activity_model.dart';
+import 'package:moodmap/core/services/auth_service.dart';
+import 'package:moodmap/core/services/visited_place_service.dart'; // Make sure you have this service
+import 'package:shared_preferences/shared_preferences.dart'; // For accessing user preferences
 
 class ListingBox extends StatelessWidget {
-  final dynamic item;  
-  
-  ListingBox({required this.item});
+  final dynamic item;
+  final bool showReviewButton; // Flag to show Review button
+  final VoidCallback? onReviewPressed; // Callback when review button is pressed
+  final AuthService authService = AuthService();
+
+  ListingBox({required this.item, this.showReviewButton = false, this.onReviewPressed});
+
+  Future<String?> _getUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString("user_id"); // Retrieve userId from shared preferences
+  }
 
   Widget _buildPlaceholder() {
     return Container(
@@ -17,15 +28,32 @@ class ListingBox extends StatelessWidget {
     );
   }
 
+  // Function to handle the "Go" button action
+  void _handleGoButton(BuildContext context, String? userId) async {
+    final visitedPlaceService = VisitedPlaceService();
+
+    if (userId != null) {
+      // Add place to visited places
+      bool success = await visitedPlaceService.addVisitedPlace(item.id);
+
+      if (success) {
+        // Notify user of success
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Place added to your visited places!")));
+      } else {
+        // Handle failure
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to add place.")));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(1.0),
-      child: IntrinsicHeight( 
+      child: IntrinsicHeight(
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch, 
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            
             Expanded(
               child: Stack(
                 children: [
@@ -39,9 +67,9 @@ class ListingBox extends StatelessWidget {
                       color: Color(0xFFF6F6F6),
                     ),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start, 
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Image à gauche avec coins arrondis
+                        // Image on the left with rounded corners
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: item.photo != null && item.photo!.isNotEmpty
@@ -61,13 +89,11 @@ class ListingBox extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 10),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
                                   item.label,
                                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                                 ),
-                                
                                 Text(
                                   item is Activity ? item.time.toString() : item.longitude.toString(),
                                   style: TextStyle(color: Colors.grey, fontSize: 12, fontStyle: FontStyle.italic),
@@ -102,42 +128,51 @@ class ListingBox extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    top: 8,  
-                    right: 10, 
+                    top: 8,
+                    right: 10,
                     child: Text(
-                      item is Activity? getEmojiActivities(item.category):
-                      getEmojiPlaces(item.category),
-                      style: TextStyle(fontSize: 20), 
+                      item is Activity ? getEmojiActivities(item.category) : getEmojiPlaces(item.category),
+                      style: TextStyle(fontSize: 20),
                     ),
                   ),
                 ],
               ),
             ),
-
-            // Bouton Go collé à droite
-            Container(
-              width: 42, // Largeur fixe du bouton
-              decoration: BoxDecoration(
-                color:  AppTheme.blue,
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
+            // "Go" or "Review" button on the right
+            GestureDetector(
+              onTap: () async {
+                // Fetch the userId asynchronously before calling the handler
+                String? userId = await _getUserId();
+                if (showReviewButton && onReviewPressed != null) {
+                  onReviewPressed!(); // Execute review callback
+                } else {
+                  _handleGoButton(context, userId); // Execute Go button action
+                }
+              },
+              child: Container(
+                width: 42, // Fixed width for the button
+                decoration: BoxDecoration(
+                  color: AppTheme.blue,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
                 ),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                     item is Activity? Icons.play_arrow :Icons.directions_walk,
-                      size: 20, 
-                      color: Colors.black, 
-                    ),
-                    Text(
-                      'Go',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        showReviewButton ? Icons.rate_review : (item is Activity ? Icons.play_arrow : Icons.directions_walk),
+                        size: 20,
+                        color: Colors.black,
+                      ),
+                      Text(
+                        showReviewButton ? 'Review' : 'Go',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -20,6 +20,7 @@ ListingItem _$ListingItemFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ListingItem {
+  String get id => throw _privateConstructorUsedError;
   String get label => throw _privateConstructorUsedError;
   double get latitude => throw _privateConstructorUsedError;
   double get longitude => throw _privateConstructorUsedError;
@@ -47,7 +48,8 @@ abstract class $ListingItemCopyWith<$Res> {
       _$ListingItemCopyWithImpl<$Res, ListingItem>;
   @useResult
   $Res call(
-      {String label,
+      {String id,
+      String label,
       double latitude,
       double longitude,
       String description,
@@ -73,6 +75,7 @@ class _$ListingItemCopyWithImpl<$Res, $Val extends ListingItem>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? label = null,
     Object? latitude = null,
     Object? longitude = null,
@@ -84,6 +87,10 @@ class _$ListingItemCopyWithImpl<$Res, $Val extends ListingItem>
     Object? updatedAt = freezed,
   }) {
     return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       label: null == label
           ? _value.label
           : label // ignore: cast_nullable_to_non_nullable
@@ -133,7 +140,8 @@ abstract class _$$ListingItemImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String label,
+      {String id,
+      String label,
       double latitude,
       double longitude,
       String description,
@@ -157,6 +165,7 @@ class __$$ListingItemImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? label = null,
     Object? latitude = null,
     Object? longitude = null,
@@ -168,6 +177,10 @@ class __$$ListingItemImplCopyWithImpl<$Res>
     Object? updatedAt = freezed,
   }) {
     return _then(_$ListingItemImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       label: null == label
           ? _value.label
           : label // ignore: cast_nullable_to_non_nullable
@@ -212,7 +225,8 @@ class __$$ListingItemImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ListingItemImpl implements _ListingItem {
   const _$ListingItemImpl(
-      {required this.label,
+      {required this.id,
+      required this.label,
       required this.latitude,
       required this.longitude,
       required this.description,
@@ -226,6 +240,8 @@ class _$ListingItemImpl implements _ListingItem {
   factory _$ListingItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$ListingItemImplFromJson(json);
 
+  @override
+  final String id;
   @override
   final String label;
   @override
@@ -253,7 +269,7 @@ class _$ListingItemImpl implements _ListingItem {
 
   @override
   String toString() {
-    return 'ListingItem(label: $label, latitude: $latitude, longitude: $longitude, description: $description, category: $category, photo: $photo, moods: $moods, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'ListingItem(id: $id, label: $label, latitude: $latitude, longitude: $longitude, description: $description, category: $category, photo: $photo, moods: $moods, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -261,6 +277,7 @@ class _$ListingItemImpl implements _ListingItem {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ListingItemImpl &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.label, label) || other.label == label) &&
             (identical(other.latitude, latitude) ||
                 other.latitude == latitude) &&
@@ -282,6 +299,7 @@ class _$ListingItemImpl implements _ListingItem {
   @override
   int get hashCode => Object.hash(
       runtimeType,
+      id,
       label,
       latitude,
       longitude,
@@ -310,7 +328,8 @@ class _$ListingItemImpl implements _ListingItem {
 
 abstract class _ListingItem implements ListingItem {
   const factory _ListingItem(
-      {required final String label,
+      {required final String id,
+      required final String label,
       required final double latitude,
       required final double longitude,
       required final String description,
@@ -323,6 +342,8 @@ abstract class _ListingItem implements ListingItem {
   factory _ListingItem.fromJson(Map<String, dynamic> json) =
       _$ListingItemImpl.fromJson;
 
+  @override
+  String get id;
   @override
   String get label;
   @override

@@ -4,6 +4,7 @@ from api.serializers import (
     UserLoginSerializer,
     UserUpdateSerializer,
     UserSerializer,
+    UserInfoSerializer,
     MoodSerializer,
     MoodEntrySerializer,
     PlaceSerializer,
@@ -20,6 +21,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import action
 from api.models import (
+    User,
     Mood,
     Place,
     VisitedPlace,
@@ -108,10 +110,85 @@ class AuthViewSet(viewsets.GenericViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="logout",
+        permission_classes=[IsAuthenticated],
+    )
+    def logout(self, request):
+        """
+        Handles user logout by invalidating the refresh token.
+        """
+        try:
+            # Blacklist the refresh token
+            refresh_token = request.data.get("refresh_token", None)
+
+            if not refresh_token:
+                return Response(
+                    {"detail": "Refresh token is required"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            try:
+                # Decode the refresh token to access the token object
+                token = RefreshToken(refresh_token)
+                # Blacklist the refresh token
+                token.blacklist()
+
+                return Response(
+                    {"detail": "Logout successful"},
+                    status=status.HTTP_200_OK,
+                )
+            except Exception:
+                return Response(
+                    {"detail": "Invalid token"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception as e:
+            return Response(
+                {"detail": f"Error during logout: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    serializer_class = UserInfoSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.filter(id=self.request.user.id)
+
+    def get_object(self):
+        return self.request.user
+
+    @action(detail=False, methods=["get"], url_path="get-user-id")
+    def get_user_id(self, request):
+        """
+        Returns the id of the currently authenticated user.
+        """
+        user_id = request.user.id
+        return Response({"user_id": user_id}, status=status.HTTP_200_OK)
+
 
 class MoodViewSet(viewsets.ModelViewSet):
     serializer_class = MoodSerializer
     queryset = Mood.objects.all()
+
+    @action(detail=False, methods=["get"], url_path="get-id-by-name")
+    def get_id_by_name(self, request):
+        # Retrieve the 'name' query parameter from the request
+        mood_name = request.query_params.get("label", None)
+
+        if mood_name is None:
+            return Response({"error": "Mood name is required"}, status=400)
+
+        try:
+            # Find the Mood by name (case-insensitive)
+            mood = Mood.objects.get(label__iexact=mood_name)
+            return Response({"id": mood.id}, status=200)
+        except Mood.DoesNotExist:
+            return Response({"error": "Mood not found"}, status=404)
 
 
 class MoodEntryViewSet(viewsets.ModelViewSet):
@@ -153,7 +230,14 @@ class VisitedPlaceViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = VisitedPlaceSerializer
-    queryset = VisitedPlace.objects.all()
+    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
+
+    def get_queryset(self):
+        """
+        This view returns a list of all the visited places for the currently authenticated user.
+        """
+        user = self.request.user  # Get the authenticated user
+        return VisitedPlace.objects.filter(user=user)
 
 
 class FavouritePlaceViewSet(viewsets.ModelViewSet):

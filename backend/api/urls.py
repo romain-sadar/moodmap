@@ -11,6 +11,7 @@ from api.views import (
     ActivityViewSet,
     ActivityCategoryViewSet,
     FavouritesGroupedByMoodViewSet,
+    UserViewSet,
 )
 
 router = DefaultRouter()
@@ -25,6 +26,7 @@ router.register(r"activity", ActivityViewSet, basename="activity")
 router.register(
     r"activity-category", ActivityCategoryViewSet, basename="activity-category"
 )
+router.register(r"profile", UserViewSet, basename="user-profile")
 
 urlpatterns = [
     path("", include(router.urls)),

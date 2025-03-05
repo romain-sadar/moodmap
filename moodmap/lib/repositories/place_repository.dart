@@ -14,7 +14,8 @@ class PlaceRepository {
     return await placeService.fetchPlaceById(id);
   }
 
-  Future<ListingItem> getPlaceByMood(String mood) async {
-    return await placeService.fetchPlaceByMood(mood);
+  Future<List<ListingItem>> getPlacesByMood(String mood) async {
+    return await placeService.fetchPlacesByMood(mood);
   }
+
 }

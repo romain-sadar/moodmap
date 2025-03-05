@@ -12,6 +12,7 @@ class PlaceService {
   if (response.statusCode == 200) {
     Map<String, dynamic> data = json.decode(response.body);
     List<dynamic> placesData = data['results'];
+    print('Fetched Places Data: $placesData');
 
     return placesData.map((json) => ListingItem.fromJson(json)).toList();
   } else {
@@ -30,13 +31,17 @@ class PlaceService {
     }
   }
 
-  Future<ListingItem> fetchPlaceByMood(String mood) async {
+  Future<List<ListingItem>> fetchPlacesByMood(String mood) async {
     final response = await http.get(Uri.parse('$baseUrl/place/?moods[]=$mood'));
 
     if (response.statusCode == 200) {
-      return ListingItem.fromJson(json.decode(response.body));
+      Map<String, dynamic> data = json.decode(response.body);
+      List<dynamic> placesData = data['results'];
+
+      return placesData.map((json) => ListingItem.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to load place');
+      throw Exception('Failed to load places');
     }
   }
+
 }

@@ -8,6 +8,7 @@ part of 'place_model.dart';
 
 _$ListingItemImpl _$$ListingItemImplFromJson(Map<String, dynamic> json) =>
     _$ListingItemImpl(
+      id: json['id'] as String,
       label: json['label'] as String,
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
@@ -21,6 +22,7 @@ _$ListingItemImpl _$$ListingItemImplFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$ListingItemImplToJson(_$ListingItemImpl instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'label': instance.label,
       'latitude': instance.latitude,
       'longitude': instance.longitude,

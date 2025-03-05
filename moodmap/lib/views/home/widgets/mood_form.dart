@@ -1,36 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:moodmap/core/themes.dart';
+import 'package:moodmap/views/home/home_screen.dart';
 
 enum Mood {
-  verySad("😢", "Very Sad"),
-  sad("😞", "Sad"),
-  neutral("😐", "Neutral"),
+  angry("😡", "Angry"),
+  calm("😌", "Calm"),
+  excited("🤩", "Excited"),
   happy("🙂", "Happy"),
-  veryHappy("😄", "Very Happy");
+  stressed("😖", "Stressed"),
+  tired("🥱", "Tired");
 
   final String emoji;
   final String label;
 
   const Mood(this.emoji, this.label);
-   List<String> get tags {
+
+  List<String> get tags {
     switch (this) {
-      case Mood.verySad:
-        return ["Stressed", "Depressed", "Hopeless", "Exhausted"];
-      case Mood.sad:
-        return ["Anxious", "Worried", "Disappointed", "Frustrated"];
-      case Mood.neutral:
-        return ["Indifferent", "Bored", "Relaxed", "Chill"];
+      case Mood.angry:
+        return ["Frustrated", "Irritated", "Annoyed", "Furious"];
+      case Mood.calm:
+        return ["Relaxed", "Peaceful", "Content", "Serene"];
+      case Mood.excited:
+        return ["Energetic", "Eager", "Enthusiastic", "Elated"];
       case Mood.happy:
-        return ["Excited", "Romantic", "Awesome", "Fantastic"];
-      case Mood.veryHappy:
-        return ["Euphoric", "Overjoyed", "Ecstatic", "Unstoppable"];
+        return ["Joyful", "Optimistic", "Cheerful", "Grateful"];
+      case Mood.stressed:
+        return ["Overwhelmed", "Anxious", "Tense", "Burned out"];
+      case Mood.tired:
+        return ["Exhausted", "Sleepy", "Drained", "Fatigued"];
     }
   }
 }
-class MoodFormScreen extends StatefulWidget {
-   final VoidCallback goToHome; // Fonction à appeler pour revenir à l'écran d'accueil
 
-  // Constructor
+class MoodFormScreen extends StatefulWidget {
+  final Function(String moodLabel) goToHome;
+
   MoodFormScreen({required this.goToHome});
 
   @override
@@ -38,9 +43,9 @@ class MoodFormScreen extends StatefulWidget {
 }
 
 class _MoodFormScreenState extends State<MoodFormScreen> {
-  Mood _moodValue = Mood.happy; // Valeur initiale du slider
+  Mood _moodValue = Mood.happy;
   List<String> selectedTags = [];
-  bool wantsToMove = false; // Pour la section "Do you want to move?"
+  bool wantsToMove = false;
 
   void toggleTag(String tag) {
     setState(() {
@@ -52,7 +57,9 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
     });
   }
 
-  
+  void _navigateToHome() {
+    widget.goToHome(_moodValue.label);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,9 +67,7 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
       appBar: AppBar(
         actions: [
           TextButton(
-            onPressed: () {
-             widget.goToHome();
-            },
+            onPressed: () => widget.goToHome(""),
             child: Text("Skip", style: TextStyle(color: Colors.white, fontSize: 16)),
           )
         ],
@@ -71,7 +76,6 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
       ),
       body: Stack(
         children: [
-          // Fond bleu avec le slider et texte
           Container(
             padding: EdgeInsets.symmetric(vertical: 5),
             color: AppTheme.blue,
@@ -80,19 +84,18 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
                 Text("How do you feel?", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
                 Text(_moodValue.emoji, style: TextStyle(fontSize: 90)),
-               
                 Text(_moodValue.label, style: TextStyle(color: Colors.white, fontSize: 18)),
                 SizedBox(height: 10),
                 SliderTheme(
                   data: SliderThemeData(
-                    trackHeight: 20.0, // Épaisseur du track
-                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 13.0), // Taille du curseur
-                    activeTrackColor: Colors.white, // Couleur du track
-                    inactiveTrackColor: Colors.white54, // Couleur du track quand il n'est pas actif
-                    thumbColor: Colors.white, // Couleur du curseur
+                    trackHeight: 20.0,
+                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 13.0),
+                    activeTrackColor: Colors.white,
+                    inactiveTrackColor: Colors.white54,
+                    thumbColor: Colors.white,
                   ),
                   child: Slider(
-                    value:  Mood.values.indexOf(_moodValue).toDouble(),
+                    value: Mood.values.indexOf(_moodValue).toDouble(),
                     min: 0,
                     max: Mood.values.length - 1,
                     divisions: Mood.values.length - 1,
@@ -107,9 +110,8 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
               ],
             ),
           ),
-             // Bloc blanc avec "Describe your feelings"
           Positioned(
-            top: 255, 
+            top: 255,
             left: 0,
             right: 0,
             bottom: 0,
@@ -120,12 +122,12 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
               ),
               child: Padding(
-                padding: const EdgeInsets.only(top:50.0),
+                padding: const EdgeInsets.only(top: 50.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Describe your feelings", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height:5),
+                    SizedBox(height: 5),
                     Wrap(
                       spacing: 10,
                       children: _moodValue.tags.map((tag) {
@@ -145,12 +147,9 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
                         );
                       }).toList(),
                     ),
-                            
                     SizedBox(height: 10),
-                            
-                    
                     Text("Do you want to move somewhere?", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height:5),
+                    SizedBox(height: 5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -159,7 +158,6 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
                             backgroundColor: wantsToMove ? AppTheme.blue : Colors.white,
                             foregroundColor: wantsToMove ? Colors.white : Colors.black,
                             shape: StadiumBorder(side: BorderSide(color: AppTheme.blue)),
-                            
                           ),
                           onPressed: () => setState(() => wantsToMove = true),
                           child: Text("Yes"),
@@ -176,18 +174,11 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
                         ),
                       ],
                     ),
-                            
-                  
                     Spacer(),
-                   
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          print("Mood: ${_moodValue.label}");
-                          print("Selected Tags: $selectedTags");
-                          print("Wants to Move: $wantsToMove");
-                        },
+                        onPressed: _navigateToHome,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.blue,
                           padding: EdgeInsets.symmetric(vertical: 10),
@@ -200,8 +191,6 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
               ),
             ),
           ),
-        
-         
           Positioned(
             top: 255,
             left: 0,
@@ -214,20 +203,18 @@ class _MoodFormScreenState extends State<MoodFormScreen> {
               ),
             ),
           ),
-       ],
+        ],
       ),
     );
   }
 }
 
-
 class OvalClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     Path path = Path();
-    path.moveTo(0, size.height); // Commencer en bas à gauche
-    path.quadraticBezierTo(
-      size.width / 2, -size.height / 2, size.width, size.height); // Inverser la courbure
+    path.moveTo(0, size.height);
+    path.quadraticBezierTo(size.width / 2, -size.height / 2, size.width, size.height);
     path.lineTo(size.width, 0);
     path.lineTo(0, 0);
     path.close();
